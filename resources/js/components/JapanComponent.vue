@@ -63,6 +63,7 @@ export default {
             Axios.delete('api/japan/' + id)
             .then(response =>{
                 console.log(response.data)
+                // go(0) = 현재화면 다시 보여주기 ex)  go(-1) = 이전 화면으로
                 this.$router.go(0)
             })
             .catch(error=>{

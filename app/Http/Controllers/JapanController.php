@@ -38,7 +38,6 @@ class JapanController extends Controller
      */
     public function store(Request $request)
     {
-        debug($request);
         $imageName=time().'.'.$request->image->guessExtension();
         $request->image->move(public_path('images'), $imageName);
         $japan = new Info_program();
@@ -71,7 +70,7 @@ class JapanController extends Controller
     {
         $japans=new Info_program();
         // return response()->json(['msg'=>"업데이트 성공!"]);
-        $session = new Session();
+    
         return response()->json(['japans'=>Info_program::where('id', $id)->get()]);
     }
     /**
