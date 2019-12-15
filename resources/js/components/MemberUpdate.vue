@@ -67,7 +67,8 @@ export default {
                 const user_name = this.user_name
                 const member_info = this.member_info
                 const image = this.image
-                form.append('_method', 'patch')
+                form.append('_method', 'patch') //이것을 안하면 이미지 파일 정보가 전송 안됨. html에서는 put이나 patch 지원 안함
+                                                //그래서 http 방식으로 보내기 위해서 이렇게 함.
                 form.append('user_name', user_name)
                 if(member_info) {
                     form.append('member_info', member_info)

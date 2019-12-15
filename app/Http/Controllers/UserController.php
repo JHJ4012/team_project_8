@@ -20,9 +20,9 @@ class UserController extends Controller
     
     public function register(Request $request)
     {
-        $request['password'] = bcrypt($request->password);
+        $request['password'] = bcrypt($request->password);  //해시 처리
 
-        if(DB::table('users')->where('user_id', $request->user_id)->first())
+        if(DB::table('users')->where('user_id', $request->user_id)->first())        //데이터베이스에 있는 정보일 때 error 출력해주는 것
         {
             return response()->json(['error'=>'1']);
         }else if(DB::table('users')->where('email', $request->email)->first())
@@ -65,12 +65,12 @@ class UserController extends Controller
                 'token' => $token,
             ], 200)->cookie($cookie['key'], $cookie['value'],$cookie['minutes'],$cookie['path'],$cookie['domain'],
             $cookie['secure'],$cookie['httponly'],$cookie['samesite']);
-        }else{
+        }else{  //데이터베이스에 해당 값들이 없을 때
             return response()->json(['error'=>'invalid-credentials'],422);
         }
     }
 
-    private function getCookieDetails($token)
+    private function getCookieDetails($token)   //토큰의 정보 지정해주기 위해 만든 메서드
     {
         return [
             'key' => '_token',
@@ -86,8 +86,8 @@ class UserController extends Controller
 
     public function logout(Request $request)
     {
-        $request->user()->token()->revoke();
-        $cookie = Cookie::forget('_token');
+        $request->user()->token()->revoke();    //데이터베이스에서 토큰을 삭제하기 위함
+        $cookie = Cookie::forget('_token'); //쿠키 삭제
         $session = new Session();   //세션 제거
         $session->remove('user');
         return response()->json([

@@ -13,7 +13,7 @@
 <script>
 export default {
     mounted() {
-        if(this.$route.params.title && this.$route.params.question){
+        if(this.$route.params.title && this.$route.params.question){    //QnAView에서 수정하기로 들어온 것인지 확인하는 것.
             this.title = this.$route.params.title
             this.question = this.$route.params.question
         }
@@ -25,10 +25,10 @@ export default {
         }
     },
     methods : {
-        postQnA(e) {
+        postQnA(e) {        //완료 눌렀을 때.
             e.preventDefault();
             let currentObj = this;
-            if(this.$route.params.title && this.$route.params.question){
+            if(this.$route.params.title && this.$route.params.question){    //수정을 하기 위한 것
                 Axios.patch('/api/qna/' + this.$route.params.id, {
                     title: this.title, 
                     question : this.question
@@ -41,8 +41,8 @@ export default {
                 });
             }
             else{
-                Axios.post('/api/qna',{
-                    control : 'qna',
+                Axios.post('/api/qna',{ //수정이 아니라 create하는 것
+                    control : 'qna',//댓글인지 QnA인지 구별하기 위해
                     title : this.title,
                     question : this.question
                 })

@@ -18,7 +18,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr v-for = "qna in qnas.data" v-bind:key="qna" @click="clickQnA(qna)">
+				<tr v-for = "qna in qnas.data" v-bind:key="qna" @click="clickQnA(qna)"><!-- v-for문을 통해 list 수만큼 만듬 --> 
 					<td>{{ number + (qnas.data.indexOf(qna)+1 )}}</td>
 					<td>{{ qna.title }}</td>
 					<td>{{ qna.user_id }}</td>
@@ -27,11 +27,11 @@
 				</tr>
 			</tbody>
 		</table>
-		<pagination :data="qnas" @pagination-change-page="getResults" class="pagination">
+		<pagination :data="qnas" @pagination-change-page="getResults" class="pagination"><!-- 페이징 --> 
 			<button slot="prev-nav">&lt; 이전</button>
 			<button slot="next-nav">다음 &gt;</button>
 		</pagination>
-		<router-link to="/qna/create" v-if="token_exist == true">
+		<router-link to="/qna/create" v-if="token_exist == true"><!-- cookie가 있으면 글쓰기 버튼을 나타나게 하기 --> 
 			<button id = "new">글쓰기</button>
 		</router-link>
     </div>
@@ -49,11 +49,11 @@ export default {
 		this.getResults();
 	},
 	methods: {
-		clickQnA(qnaObj){
+		clickQnA(qnaObj){ //각 qna를 클릭했을 때
 			console.log(qnaObj.id)
 			this.$router.push({name : "QnAView", params : {id : qnaObj.id}});
 		},
-		getResults(page=1){
+		getResults(page=1){  //페이징 기능
 			axios.get('/api/qna?page=' + page)
 			.then(response => {
 				this.page = page
@@ -61,7 +61,8 @@ export default {
 			});
 		}
 	},
-	computed : {
+	computed : {   //QnA 리스트 표시할 때 앞에 QnA 번호 순서대로 나타나게 하기 위해서
+                  //computed는 연산을 위한 것.
 		number : function(){
 			return ((this.page-1) * 5)
 		}
