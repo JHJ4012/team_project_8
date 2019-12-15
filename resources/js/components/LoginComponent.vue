@@ -54,6 +54,7 @@ export default {
             })
             .then(response => {
                 console.log($cookies.isKey('_token'))
+                // console.log(response)
                 window.location.href = '/';
             })
             .catch(error => {

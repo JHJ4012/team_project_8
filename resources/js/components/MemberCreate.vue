@@ -62,10 +62,10 @@ export default {
             });
         },
         create(e) { // 생성하기 및 수정하기
-            if (this.click){
+            if (this.click){    //버튼 중복 클릭 되지 않게 하기 위해
                 this.click = false
             
-                e.preventDefault()
+                e.preventDefault()  //preventDefault는 선택된 요소의 기본 동작을 실행하는 것을 막음
                 const config = {
                     headers: {
                         contentType: "multipart/form-data", 
@@ -73,9 +73,9 @@ export default {
                 }
                 const form = new FormData()
                 
-                const user_name = e.target.id // ㅇ
-                const member_info = this.member_info // ㅇ
-                const image = this.image // ㅇ
+                const user_name = e.target.id 
+                const member_info = this.member_info 
+                const image = this.image 
     
                 form.append('member_info', member_info)
                 form.append('image', image)
@@ -83,6 +83,7 @@ export default {
                 axios.post("/api/member", form, config)
                     .then(res =>
                     {
+                        console.log(res)
                         if(res.data.error=='내용이미지') {
                             alert(res.data.error[0] + ', ' + res.data.error[1] + '을 입력해 주세요.')
                         } else if(res.data.error) {

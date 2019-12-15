@@ -46,12 +46,12 @@ export default {
         Axios.get("/api/member")
         .then(res => 
         {
+            // console.log(res);
             this.members=res.data.member
             this.user_name=res.data.user_name[0].name
             this.admin=res.data.admin[0].admin
             if(res.data.check[0]) {
                 this.check=res.data.check[0].user_id
-                console.log(res.data.check);
             }
             else {
                 this.check=0

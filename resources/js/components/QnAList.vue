@@ -55,7 +55,8 @@ export default {
 		},
 		getResults(page=1){  //페이징 기능
 			axios.get('/api/qna?page=' + page)
-			.then(response => {
+         .then(response => {
+            console.log(response)
 				this.page = page
 				this.qnas = response.data;
 			});

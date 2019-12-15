@@ -70,7 +70,7 @@ class MemberController extends Controller
         $image = $request->image;
         $user_name = $request->user_name;
 
-        $imagename = time().'.'.$request->image->getClientOriginalExtension();  
+        $imagename = time().'.'.$request->image->getClientOriginalExtension();  //이미지 이름 지정
         $request->image->move(public_path('images'), $imagename);
 
         $user_id = User::where('name', $user_name)->get('id');
@@ -104,17 +104,17 @@ class MemberController extends Controller
 
         $image_path = public_path('images').'/'.$member[0]->imagename;
 
-        if($image == '없음' && $member_info == '없음') {
+        if($image == '없음' && $member_info == '없음') {    //변경 내용 없음
             return response()->json('success');
         } 
-        else if($image == '없음' && $member_info){
+        else if($image == '없음' && $member_info){  // 소개만 변경
             Member::with('user')->where('user_id',$user_id[0]->id)->update([
                 'member_info'=>$member_info,
             ]);
 
             return response()->json('success');
         }
-        else if($image && $member_info == '없음') {
+        else if($image && $member_info == '없음') { //이미지만 변경
             if (File::exists($image_path)) {
                 File::delete($image_path);
             }
@@ -127,7 +127,7 @@ class MemberController extends Controller
 
             return response()->json('success');
         }   
-        else {
+        else {  //모두 변경
             if (File::exists($image_path)) {
                 File::delete($image_path);
             }

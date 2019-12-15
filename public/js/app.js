@@ -1911,6 +1911,7 @@ __webpack_require__.r(__webpack_exports__);
       console.log(weekId);
       this.week = weekId;
       Axios.get('/api/japan/' + weekId).then(function (response) {
+        // console.log(response)
         _this.japans = response.data.japans;
         console.log(_this.japans);
         console.log(_this.token_exist);
@@ -1927,7 +1928,7 @@ __webpack_require__.r(__webpack_exports__);
       var _this2 = this;
 
       Axios["delete"]('api/japan/' + id).then(function (response) {
-        console.log(response.data);
+        console.log(response.data); // go(0) = 현재화면 다시 보여주기 ex)  go(-1) = 이전 화면으로
 
         _this2.$router.go(0);
       })["catch"](function (error) {
@@ -2395,7 +2396,8 @@ __webpack_require__.r(__webpack_exports__);
         user_id: this.user_id,
         password: this.password
       }).then(function (response) {
-        console.log($cookies.isKey('_token'));
+        console.log($cookies.isKey('_token')); // console.log(response)
+
         window.location.href = '/';
       })["catch"](function (error) {
         _this.message = '아이디와 비밀번호를 확인해 주세요';
@@ -2534,24 +2536,25 @@ __webpack_require__.r(__webpack_exports__);
 
       // 생성하기 및 수정하기
       if (this.click) {
+        //버튼 중복 클릭 되지 않게 하기 위해
         this.click = false;
-        e.preventDefault();
+        e.preventDefault(); //preventDefault는 선택된 요소의 기본 동작을 실행하는 것을 막음
+
         var config = {
           headers: {
             contentType: "multipart/form-data"
           }
         };
         var form = new FormData();
-        var user_name = e.target.id; // ㅇ
-
-        var member_info = this.member_info; // ㅇ
-
-        var image = this.image; // ㅇ
-
+        var user_name = e.target.id;
+        var member_info = this.member_info;
+        var image = this.image;
         form.append('member_info', member_info);
         form.append('image', image);
         form.append('user_name', user_name);
         axios.post("/api/member", form, config).then(function (res) {
+          console.log(res);
+
           if (res.data.error == '내용이미지') {
             alert(res.data.error[0] + ', ' + res.data.error[1] + '을 입력해 주세요.');
           } else if (res.data.error) {
@@ -2625,13 +2628,13 @@ __webpack_require__.r(__webpack_exports__);
 
     this.image = ['bird.jpg', 'cat.jpg', 'tiger.jpg', 'hed.jpg', 'lion.jpg', 'dog.jpg'];
     Axios.get("/api/member").then(function (res) {
+      // console.log(res);
       _this.members = res.data.member;
       _this.user_name = res.data.user_name[0].name;
       _this.admin = res.data.admin[0].admin;
 
       if (res.data.check[0]) {
         _this.check = res.data.check[0].user_id;
-        console.log(res.data.check);
       } else {
         _this.check = 0;
       }
@@ -2735,6 +2738,7 @@ __webpack_require__.r(__webpack_exports__);
 
     var user_name = this.user_name;
     Axios.get("/api/member/".concat(user_name)).then(function (res) {
+      console.log(res);
       _this.member = res.data.member;
     })["catch"](function (err) {
       console.log(err);
@@ -2759,7 +2763,9 @@ __webpack_require__.r(__webpack_exports__);
         var user_name = this.user_name;
         var member_info = this.member_info;
         var image = this.image;
-        form.append('_method', 'patch');
+        form.append('_method', 'patch'); //이것을 안하면 이미지 파일 정보가 전송 안됨. html에서는 put이나 patch 지원 안함
+        //그래서 http 방식으로 보내기 위해서 이렇게 함.
+
         form.append('user_name', user_name);
 
         if (member_info) {
@@ -2889,6 +2895,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ({
   mounted: function mounted() {
     if (this.$route.params.title && this.$route.params.question) {
+      //QnAView에서 수정하기로 들어온 것인지 확인하는 것.
       this.title = this.$route.params.title;
       this.question = this.$route.params.question;
     }
@@ -2903,10 +2910,12 @@ __webpack_require__.r(__webpack_exports__);
     postQnA: function postQnA(e) {
       var _this = this;
 
+      //완료 눌렀을 때.
       e.preventDefault();
       var currentObj = this;
 
       if (this.$route.params.title && this.$route.params.question) {
+        //수정을 하기 위한 것
         Axios.patch('/api/qna/' + this.$route.params.id, {
           title: this.title,
           question: this.question
@@ -2917,7 +2926,9 @@ __webpack_require__.r(__webpack_exports__);
         });
       } else {
         Axios.post('/api/qna', {
+          //수정이 아니라 create하는 것
           control: 'qna',
+          //댓글인지 QnA인지 구별하기 위해
           title: this.title,
           question: this.question
         }).then(function (response) {
@@ -2997,6 +3008,7 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     clickQnA: function clickQnA(qnaObj) {
+      //각 qna를 클릭했을 때
       console.log(qnaObj.id);
       this.$router.push({
         name: "QnAView",
@@ -3009,13 +3021,17 @@ __webpack_require__.r(__webpack_exports__);
       var _this = this;
 
       var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+      //페이징 기능
       axios.get('/api/qna?page=' + page).then(function (response) {
+        console.log(response);
         _this.page = page;
         _this.qnas = response.data;
       });
     }
   },
   computed: {
+    //QnA 리스트 표시할 때 앞에 QnA 번호 순서대로 나타나게 하기 위해서
+    //computed는 연산을 위한 것.
     number: function number() {
       return (this.page - 1) * 5;
     }
@@ -3062,7 +3078,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -3071,6 +3086,7 @@ __webpack_require__.r(__webpack_exports__);
       view_reply: '',
       button_control: '',
       token_exist: $cookies.isKey('_token'),
+      //쿠키가 있는지 확인하는 것. 만약 있으면 true 반환
       user: ''
     };
   },
@@ -3078,17 +3094,21 @@ __webpack_require__.r(__webpack_exports__);
     var _this = this;
 
     console.log('Component mounted.');
-    Axios.get('/api/qna/' + this.$route.params.id).then(function (response) {
+    Axios.get('/api/qna/' + this.$route.params.id) //QnAList에서 파라미터로 보낸 id를 통해 해당 QnA 정보 가져오기
+    .then(function (response) {
+      // console.log(response)
       _this.qna = response.data.qna[0];
       _this.answers = response.data.reply;
 
       if (response.data.admin[0]) {
-        _this.user = response.data.admin[0];
+        //로그인 되어 있는 상태면 true로 되어 작동할 것. 로그아웃이면 값이 없기 때문에 작동 안함
+        _this.user = response.data.admin[0]; //지금 로그인 해 있는 사용자의 권한을 알기 위해서
       }
 
-      if (_this.qna.user_id == response.data.user) {
-        _this.button_control = 1;
-      }
+      if (_this.qna.user_id == response.data.user) //자신의 글인지 아닌지 확인하기 위해
+        {
+          _this.button_control = 1;
+        }
     })["catch"](function (error) {
       console.log(error);
     });
@@ -3100,6 +3120,7 @@ __webpack_require__.r(__webpack_exports__);
     deleteQnA: function deleteQnA() {
       var _this2 = this;
 
+      //삭제 버튼 눌렀을 떄
       Axios["delete"]('/api/qna/' + this.$route.params.id).then(function (response) {
         _this2.$router.push('/qna');
       })["catch"](function (error) {
@@ -3107,6 +3128,7 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     updateQnA: function updateQnA() {
+      //수정하기 눌렀을 때. 해당 QnA의 제목과 내용을 파라미터로 준다
       this.$router.push({
         name: "QnACreate",
         params: {
@@ -3119,20 +3141,24 @@ __webpack_require__.r(__webpack_exports__);
     createAnswer: function createAnswer(e) {
       var _this3 = this;
 
+      //답글 생성하기
       e.preventDefault();
       var currentObj = this;
       Axios.post('/api/qna', {
         control: 'reply',
         qna_id: this.$route.params.id,
-        user_id: 'test',
         reply: this.view_reply
       }).then(function (response) {
-        _this3.filter(response.data.reply);
+        console.log(response);
+
+        _this3.filter(response.data.reply); //댓글을 생성했을 때 화면 이동없이 바로 값을 바꿔주기 위해 filter라는 메서드를 연결한다
+
       })["catch"](function (error) {
         console.log(error);
       });
     },
     filter: function filter(new_answers) {
+      //answers의 정보를 바꿔주고 view_reply 칸을 비워준다.
       this.answers = new_answers;
       this.view_reply = '';
     }

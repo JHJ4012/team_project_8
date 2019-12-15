@@ -45,7 +45,7 @@ class JapanController extends Controller
         $japan->image=$imageName;
         $japan->title=$request->title;
 
-        $info_br = str_replace("<br/>", "\r\n", $request->info);
+        $info_br = str_replace("<br/>", "\r\n", $request->info);    //띄어쓰기 문제 때문에
         $japan->info=$info_br;
 
         $japan->save();

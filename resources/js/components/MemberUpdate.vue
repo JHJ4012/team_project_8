@@ -43,6 +43,7 @@ export default {
         Axios.get(`/api/member/${user_name}`)
         .then(res => 
         {
+            console.log(res)
             this.member=res.data.member
         })
         .catch(err=> {

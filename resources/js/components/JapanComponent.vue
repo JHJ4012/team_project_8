@@ -45,6 +45,7 @@ export default {
             this.week=weekId
               Axios.get('/api/japan/'+weekId)
             .then((response)=>{
+                // console.log(response)
                 this.japans = response.data.japans
                 console.log(this.japans)
                 console.log(this.token_exist)
