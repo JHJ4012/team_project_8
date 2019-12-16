@@ -22,10 +22,10 @@ class UserController extends Controller
     {
         $request['password'] = bcrypt($request->password);  //해시 처리
 
-        if(DB::table('users')->where('user_id', $request->user_id)->first())        //데이터베이스에 있는 정보일 때 error 출력해주는 것
+        if(User::where('user_id', $request->user_id)->first())        //데이터베이스에 있는 정보일 때 error 출력해주는 것
         {
             return response()->json(['error'=>'1']);
-        }else if(DB::table('users')->where('email', $request->email)->first())
+        }else if(User::where('email', $request->email)->first())
         {
             return response()->json(['error'=>'2']);
         }
