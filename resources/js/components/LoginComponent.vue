@@ -21,7 +21,7 @@
                     <div class="form-group">
                         <button>확인</button>
                         <button v-on:click="back">취소</button>
-                    </div>  
+                    </div>   
                 </form>
             </div>
             <div class="new">
@@ -39,12 +39,12 @@ export default {
         return{
             user_id : '',
             password : '',
-            message: ''
+            message : ''
         }
     },
     methods : {
         postLogin(e) {
-            e.preventDefault();
+            e.preventDefault(); //선택된 요소의 기본 동작을 실행하는 것을 막음
             let currentObj = this;
             console.log(this.user_id)
             console.log(this.password)

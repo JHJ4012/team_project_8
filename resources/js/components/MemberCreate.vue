@@ -11,11 +11,11 @@
                                 <img src="/image/bird.jpg" class="mem1"> <!-- 탭 클릭했을 때 보이는 조원1의 배경사진 -->
                                 <div id="member_member1Hidden"> <!-- 탭을 클릭 했을 때 보이는 조원1의 사진, 이름, 한줄소개 -->
                                     <img :src="uploadImageFile" id="member_member1Image"><br />
-                                    이름 : <p>하잇!</p> <!-- 로그인 유저 아이디 -->
-                                    소개 : <input type="text" v-model="member_info" placeholder="소개글 작성하기"> <br />
-                                    이미지 : <input id="image" type="file" v-on:change="onImageChange"> <br />
-                                    <input type="button" value="생성하기" @click="create" id="1"> <!-- session -->
-                                    <input type="button" value="뒤로가기" @click="back">
+                                    <p style="margin-top: 1%">이름 : {{ user_name }}</p> <!-- 로그인 유저 아이디 -->
+                                    소개 : <input type="text" v-model="member_info" placeholder="소개글 작성하기" class="intro" style="margin-top: 1%;"> <br />
+                                    이미지 : <input id="image" type="file" accept="image/*" v-on:change="onImageChange" style="margin-top: 1%; width: 20%"> <br />
+                                    <input type="button" value="생성하기" @click="create" :id="user_name" class="ok-button"> <!-- session -->
+                                    <input type="button" value="뒤로가기" @click="back" class="cancel-button">
                                 </div>
                             </div>
                             </div>
@@ -32,8 +32,9 @@ export default {
         return {
             member_info : '',
             image : '',
-            class : '',
-            uploadImageFile : ''
+            uploadImageFile : '',
+            user_name : this.$route.params.user_name,
+            click : true,
         }
     },
     mounted() {
@@ -45,46 +46,62 @@ export default {
         },
         onImageChange(e){ // 이미지 파일 찾아내기
             this.image = e.target.files[0]
-            var input = e.target;
-            if(input.files && input.files[0]) {
-                var reader = new FileReader();
-                reader.readAsDataURL(input.files[0]);
-                reader.onload = (e) => {
-                    this.uploadImageFile = e.target.result; // 로컬 이미지 보여주기 
+            var input = e.target.files;
+            var filesArr = Array.prototype.slice.call(input);
+            filesArr.forEach((f)=> {
+                if(!f.type.match("image.*")) {
+                    alert("확장자는 이미지 확장자만 가능합니다.");
+                    return;
                 }
-            }
+
+                var reader = new FileReader();
+                reader.readAsDataURL(f);
+                reader.onload = (e) => {
+                    this.uploadImageFile = e.target.result;
+                }
+            });
         },
         create(e) { // 생성하기 및 수정하기
-            e.preventDefault()
-            let config = {
-                headers: {
-                    contentType: "multipart/form-data", 
-                }
-            }
-            const form = new FormData()
+            if (this.click){
+                this.click = false
             
-            const id = e.target.id // ㅇ
-            const member_info = this.member_info // ㅇ
-            const image = this.image // ㅇ
- 
-            form.append('id', id)
-            form.append('member_info', member_info)
-            form.append('image', image)
-            axios.post("/api/member", form, config)
-                .then(res =>
-                {
-                    this.$router.push('/member') 
-                })
-                .catch(err => {
-                console.log(err)
-            });
+                e.preventDefault()
+                const config = {
+                    headers: {
+                        contentType: "multipart/form-data", 
+                    }
+                }
+                const form = new FormData()
+                
+                const user_name = e.target.id // ㅇ
+                const member_info = this.member_info // ㅇ
+                const image = this.image // ㅇ
+    
+                form.append('member_info', member_info)
+                form.append('image', image)
+                form.append('user_name', user_name)
+                axios.post("/api/member", form, config)
+                    .then(res =>
+                    {
+                        if(res.data.error=='내용이미지') {
+                            alert(res.data.error[0] + ', ' + res.data.error[1] + '을 입력해 주세요.')
+                        } else if(res.data.error) {
+                            alert(res.data.error + '을 입력해 주세요.')
+                        } else {
+                            this.$router.push('/member') 
+                        } 
+                    })
+                    .catch(err => {
+                        console.log(err)
+                });
+            }
         }
     }
 }
 </script>
 
 <style scoped>
-.body {margin-top: 13%;margin-left: 8%;height: auto}
+.body {margin-top: 13%;margin-left: 8%;height: auto;}
 .mem1,
 .mem2,
 .mem3,
@@ -93,6 +110,14 @@ export default {
 .mem6 {
     width: 100%;
 }
+
+.intro {
+    background-color: transparent;
+    border: 0px solid transparent;
+    border-bottom: 2px solid white;
+    color: #fff;
+}
+
 #member_member1Image,
 #member_member2Image,
 #member_member3Image,
@@ -110,62 +135,27 @@ export default {
     padding-top: 20%;
     padding-bottom: 20%;
 }
-#member_member2Hidden {
-    background-color: rgba(0, 0, 0, 0.7);
-    text-align: center;
+#member_member1Hidden .ok-button, .cancel-button {
     color: white;
-    font-size: 20px;
-    position: relative;
-    z-index: 100;
-    margin-top: -73%;
-    padding-top: 20%;
-    padding-bottom: 20%;
+    background-color: transparent;
+    border: 0px;
+	border: 2px solid #fff;
+	border-radius: 6px;
+    margin-top: 3%;
+	padding: 3px;
+    font-size: 15px;
+    cursor: pointer;
 }
-#member_member3Hidden {
-    background-color: rgba(0, 0, 0, 0.7);
-    text-align: center;
-    color: white;
-    font-size: 20px;
-    position: relative;
-    z-index: 100;
-    margin-top: -73%;
-    padding-top: 20%;
-    padding-bottom: 20%;
+
+.ok-button:hover {
+    background-color: #fff;
+    color: #000;
 }
-#member_member4Hidden {
-    background-color: rgba(0, 0, 0, 0.7);
-    text-align: center;
-    color: white;
-    font-size: 20px;
-    position: relative;
-    z-index: 100;
-    margin-top: -73%;
-    padding-top: 20%;
-    padding-bottom: 20%;
+
+.cancel-button:hover {
+    background-color: #fff;
+    color: #000;
 }
-#member_member5Hidden {
-    background-color: rgba(0, 0, 0, 0.7);
-    text-align: center;
-    color: white;
-    font-size: 20px;
-    position: relative;
-    z-index: 100;
-    margin-top: -73%;
-    padding-top: 20%;
-    padding-bottom: 20%;
-}
-#member_member6Hidden {
-    background-color: rgba(0, 0, 0, 0.7);
-    text-align: center;
-    color: white;
-    font-size: 20px;
-    position: relative;
-    z-index: 100;
-    margin-top: -73%;
-    padding-top: 20%;
-    padding-bottom: 20%;
-}
-#member_member1Hidden input {margin: 1%}
 [data-theme*=_bgp1] {
     /* background: url(/image/bird.jpg); */
     background: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1) 70%), url(/image/bird.jpg);

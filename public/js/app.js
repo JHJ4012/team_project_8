@@ -2205,8 +2205,6 @@ __webpack_require__.r(__webpack_exports__);
 
           _this.$router.push('/login');
         }
-      })["catch"](function (error) {
-        console.log(error);
       });
     },
     back: function back() {
@@ -2503,8 +2501,9 @@ __webpack_require__.r(__webpack_exports__);
     return {
       member_info: '',
       image: '',
-      "class": '',
-      uploadImageFile: ''
+      uploadImageFile: '',
+      user_name: this.$route.params.user_name,
+      click: true
     };
   },
   mounted: function mounted() {
@@ -2519,42 +2518,56 @@ __webpack_require__.r(__webpack_exports__);
 
       // 이미지 파일 찾아내기
       this.image = e.target.files[0];
-      var input = e.target;
+      var input = e.target.files;
+      var filesArr = Array.prototype.slice.call(input);
+      filesArr.forEach(function (f) {
+        if (!f.type.match("image.*")) {
+          alert("확장자는 이미지 확장자만 가능합니다.");
+          return;
+        }
 
-      if (input.files && input.files[0]) {
         var reader = new FileReader();
-        reader.readAsDataURL(input.files[0]);
+        reader.readAsDataURL(f);
 
         reader.onload = function (e) {
-          _this.uploadImageFile = e.target.result; // 로컬 이미지 보여주기 
+          _this.uploadImageFile = e.target.result;
         };
-      }
+      });
     },
     create: function create(e) {
       var _this2 = this;
 
       // 생성하기 및 수정하기
-      e.preventDefault();
-      var config = {
-        headers: {
-          contentType: "multipart/form-data"
-        }
-      };
-      var form = new FormData();
-      var id = e.target.id; // ㅇ
+      if (this.click) {
+        this.click = false;
+        e.preventDefault();
+        var config = {
+          headers: {
+            contentType: "multipart/form-data"
+          }
+        };
+        var form = new FormData();
+        var user_name = e.target.id; // ㅇ
 
-      var member_info = this.member_info; // ㅇ
+        var member_info = this.member_info; // ㅇ
 
-      var image = this.image; // ㅇ
+        var image = this.image; // ㅇ
 
-      form.append('id', id);
-      form.append('member_info', member_info);
-      form.append('image', image);
-      axios.post("/api/member", form, config).then(function (res) {
-        _this2.$router.push('/member');
-      })["catch"](function (err) {
-        console.log(err);
-      });
+        form.append('member_info', member_info);
+        form.append('image', image);
+        form.append('user_name', user_name);
+        axios.post("/api/member", form, config).then(function (res) {
+          if (res.data.error == '내용이미지') {
+            alert(res.data.error[0] + ', ' + res.data.error[1] + '을 입력해 주세요.');
+          } else if (res.data.error) {
+            alert(res.data.error + '을 입력해 주세요.');
+          } else {
+            _this2.$router.push('/member');
+          }
+        })["catch"](function (err) {
+          console.log(err);
+        });
+      }
     }
   }
 });
@@ -2605,14 +2618,28 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       members: {},
-      lv: 2
+      lv: 2,
+      user_name: '',
+      admin: '',
+      check: '',
+      image: []
     };
   },
   mounted: function mounted() {
     var _this = this;
 
+    this.image = ['bird.jpg', 'cat.jpg', 'tiger.jpg', 'hed.jpg', 'lion.jpg', 'dog.jpg'];
     Axios.get("/api/member").then(function (res) {
       _this.members = res.data.member;
+      _this.user_name = res.data.user_name[0].name;
+      _this.admin = res.data.admin[0].admin;
+
+      if (res.data.check[0]) {
+        _this.check = res.data.check[0].user_id;
+        console.log(res.data.check);
+      } else {
+        _this.check = 0;
+      }
     })["catch"](function (err) {
       console.log(err);
     });
@@ -2623,7 +2650,7 @@ __webpack_require__.r(__webpack_exports__);
       this.$router.push({
         name: 'MemberCreate',
         params: {
-          "user_id": id
+          "user_name": id
         }
       }); // 로그인 아이디 필요
     },
@@ -2632,7 +2659,7 @@ __webpack_require__.r(__webpack_exports__);
       this.$router.push({
         name: 'MemberUpdate',
         params: {
-          "user_id": id
+          "user_name": id
         }
       });
     },
@@ -2642,7 +2669,8 @@ __webpack_require__.r(__webpack_exports__);
       var id = e.target.id;
       axios["delete"]("/api/member/".concat(id)).then(function (res) {
         _this2.members = res.data.member;
-        console.log(res.data.member);
+        _this2.check = 0;
+        _this2.admin = 'admin';
       })["catch"](function (err) {
         console.log(err);
       });
@@ -2687,6 +2715,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2699,15 +2728,19 @@ __webpack_require__.r(__webpack_exports__);
       },
       // 시간차 렌더
       member_info: '',
-      image: ''
+      image: '',
+      user_name: this.$route.params.user_name,
+      uploadImageFile: '',
+      check: 1,
+      click: true
     };
   },
   mounted: function mounted() {
     var _this = this;
 
-    var user_id = this.$route.params.user_id;
-    Axios.get("/api/member/".concat(user_id)).then(function (res) {
-      _this.member = res.data.member[0];
+    var user_name = this.user_name;
+    Axios.get("/api/member/".concat(user_name)).then(function (res) {
+      _this.member = res.data.member;
     })["catch"](function (err) {
       console.log(err);
     });
@@ -2719,30 +2752,61 @@ __webpack_require__.r(__webpack_exports__);
     update: function update(e) {
       var _this2 = this;
 
-      var config = {
-        headers: {
-          processData: true,
-          contentType: "multipart/form-data"
+      if (this.click) {
+        this.click = false;
+        var config = {
+          headers: {
+            processData: true,
+            contentType: "multipart/form-data"
+          }
+        };
+        var form = new FormData();
+        var user_name = this.user_name;
+        var member_info = this.member_info;
+        var image = this.image;
+        form.append('_method', 'patch');
+        form.append('user_name', user_name);
+
+        if (member_info) {
+          form.append('member_info', member_info);
+        } else {
+          form.append('member_info', '없음');
         }
-      };
-      var form = new FormData();
-      var id = this.$route.params.user_id;
-      var member_info = this.member_info;
-      var image = this.image;
-      form.append('_method', 'patch');
-      form.append('id', id);
-      form.append('member_info', member_info);
-      form.append('image', image);
-      Axios.post("/api/member/".concat(id), form, config).then(function (res) {
-        _this2.$router.push('/member');
-      })["catch"](function (err) {
-        console.log(err);
-      });
+
+        if (image) {
+          form.append('image', image);
+        } else {
+          form.append('image', '없음');
+        }
+
+        Axios.post("/api/member/".concat(user_name), form, config).then(function (res) {
+          _this2.$router.push('/member');
+        })["catch"](function (err) {
+          console.log(err);
+        });
+      }
     },
     onImageChange: function onImageChange(e) {
+      var _this3 = this;
+
       // 이미지 파일 찾아내기
       this.image = e.target.files[0];
-      console.log(e.target.files[0]);
+      var input = e.target.files;
+      this.check = 0;
+      var filesArr = Array.prototype.slice.call(input);
+      filesArr.forEach(function (f) {
+        if (!f.type.match("image.*")) {
+          alert("확장자는 이미지 확장자만 가능합니다.");
+          return;
+        }
+
+        var reader = new FileReader();
+        reader.readAsDataURL(f);
+
+        reader.onload = function (e) {
+          _this3.uploadImageFile = e.target.result;
+        };
+      });
     }
   }
 });
@@ -3014,7 +3078,8 @@ __webpack_require__.r(__webpack_exports__);
       answers: '',
       view_reply: '',
       button_control: '',
-      token_exist: $cookies.isKey('_token')
+      token_exist: $cookies.isKey('_token'),
+      user: ''
     };
   },
   mounted: function mounted() {
@@ -3024,6 +3089,7 @@ __webpack_require__.r(__webpack_exports__);
     Axios.get('/api/qna/' + this.$route.params.id).then(function (response) {
       _this.qna = response.data.qna[0];
       _this.answers = response.data.reply;
+      _this.user = response.data.admin[0];
 
       if (_this.qna.user_id == response.data.user) {
         _this.button_control = 1;
@@ -7677,7 +7743,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.body[data-v-fb28b5be] {margin-top: 13%;margin-left: 8%;height: auto}\n.mem1[data-v-fb28b5be],\r\n.mem2[data-v-fb28b5be],\r\n.mem3[data-v-fb28b5be],\r\n.mem4[data-v-fb28b5be],\r\n.mem5[data-v-fb28b5be],\r\n.mem6[data-v-fb28b5be] {\r\n    width: 100%;\n}\n#member_member1Image[data-v-fb28b5be],\r\n#member_member2Image[data-v-fb28b5be],\r\n#member_member3Image[data-v-fb28b5be],\r\n#member_member4Image[data-v-fb28b5be],\r\n#member_member5Image[data-v-fb28b5be],\r\n#member_member6Image[data-v-fb28b5be] {width: 20%;float: inherit}\n#member_member1Hidden[data-v-fb28b5be] {\r\n    background-color: rgba(0, 0, 0, 0.7);\r\n    text-align: center;\r\n    color: white;\r\n    font-size: 20px;\r\n    position: relative;\r\n    z-index: 100;\r\n    margin-top: -73%;\r\n    padding-top: 20%;\r\n    padding-bottom: 20%;\n}\n#member_member2Hidden[data-v-fb28b5be] {\r\n    background-color: rgba(0, 0, 0, 0.7);\r\n    text-align: center;\r\n    color: white;\r\n    font-size: 20px;\r\n    position: relative;\r\n    z-index: 100;\r\n    margin-top: -73%;\r\n    padding-top: 20%;\r\n    padding-bottom: 20%;\n}\n#member_member3Hidden[data-v-fb28b5be] {\r\n    background-color: rgba(0, 0, 0, 0.7);\r\n    text-align: center;\r\n    color: white;\r\n    font-size: 20px;\r\n    position: relative;\r\n    z-index: 100;\r\n    margin-top: -73%;\r\n    padding-top: 20%;\r\n    padding-bottom: 20%;\n}\n#member_member4Hidden[data-v-fb28b5be] {\r\n    background-color: rgba(0, 0, 0, 0.7);\r\n    text-align: center;\r\n    color: white;\r\n    font-size: 20px;\r\n    position: relative;\r\n    z-index: 100;\r\n    margin-top: -73%;\r\n    padding-top: 20%;\r\n    padding-bottom: 20%;\n}\n#member_member5Hidden[data-v-fb28b5be] {\r\n    background-color: rgba(0, 0, 0, 0.7);\r\n    text-align: center;\r\n    color: white;\r\n    font-size: 20px;\r\n    position: relative;\r\n    z-index: 100;\r\n    margin-top: -73%;\r\n    padding-top: 20%;\r\n    padding-bottom: 20%;\n}\n#member_member6Hidden[data-v-fb28b5be] {\r\n    background-color: rgba(0, 0, 0, 0.7);\r\n    text-align: center;\r\n    color: white;\r\n    font-size: 20px;\r\n    position: relative;\r\n    z-index: 100;\r\n    margin-top: -73%;\r\n    padding-top: 20%;\r\n    padding-bottom: 20%;\n}\n#member_member1Hidden input[data-v-fb28b5be] {margin: 1%}\n[data-theme*=_bgp1][data-v-fb28b5be] {\r\n    /* background: url(/image/bird.jpg); */\r\n    background: -webkit-gradient(linear, left top, right top, from(rgba(0, 0, 0, 0)), color-stop(70%, rgba(0, 0, 0, 1))), url(/image/bird.jpg);\r\n    background: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1) 70%), url(/image/bird.jpg);\r\n    background-repeat: no-repeat;\r\n    /* background-image: linear-gradient(to right, rgba(255,0,0,0), rgba(255,0,0,1)); */\r\n    color: white;\n}\n[data-theme*=_bgp2][data-v-fb28b5be] {\r\n    /* background: url(/image/cat.jpg); */\r\n    background: -webkit-gradient(linear, left top, right top, from(rgba(0, 0, 0, 0)), color-stop(70%, rgba(0, 0, 0, 1))), url(/image/cat.jpg);\r\n    background: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1) 70%), url(/image/cat.jpg);\r\n    background-repeat: no-repeat;\r\n    color: white;\n}\n[data-theme*=_bgp3][data-v-fb28b5be] {\r\n    /* background: url(/image/tiger.jpg); */\r\n    background: -webkit-gradient(linear, left top, right top, from(rgba(255, 255, 255, 0)), color-stop(70%, rgba(0, 0, 0, 1))), url(/image/tiger.jpg);\r\n    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(0, 0, 0, 1) 70%), url(/image/tiger.jpg);\r\n    background-repeat: no-repeat;\r\n    color: white;\n}\n[data-theme*=_bgp4][data-v-fb28b5be] {\r\n    /* background: url(/image/hed.jpg); */\r\n    background: -webkit-gradient(linear, left top, right top, from(rgba(255, 255, 255, 0)), color-stop(70%, rgba(0, 0, 0, 1))), url(/image/hed.jpg);\r\n    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(0, 0, 0, 1) 70%), url(/image/hed.jpg);\r\n    background-repeat: no-repeat;\r\n    color: white;\n}\n[data-theme*=_bgp5][data-v-fb28b5be] {\r\n    /* background: url(/image/lion.jpg); */\r\n    background: -webkit-gradient(linear, left top, right top, from(rgba(255, 255, 255, 0)), color-stop(70%, rgba(0, 0, 0, 1))), url(/image/lion.jpg);\r\n    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(0, 0, 0, 1) 70%), url(/image/lion.jpg);\r\n    background-repeat: no-repeat;\r\n    color: white;\n}\n[data-theme*=_bgp6][data-v-fb28b5be] {\r\n    /* background: url(/image/dog.jpg); */\r\n    background: -webkit-gradient(linear, left top, right top, from(rgba(255, 255, 255, 0)), color-stop(70%, rgba(0, 0, 0, 1))), url(/image/dog.jpg);\r\n    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(0, 0, 0, 1) 70%), url(/image/dog.jpg);\r\n    background-repeat: no-repeat;\r\n    color: white;\n}\n[data-layout=_r][data-v-fb28b5be] {\r\n    max-width: 100%;\r\n    margin-left: 3%;\r\n    /*margin: 0 auto;*/\r\n    /*    padding: 2rem 1rem;*/\n}\n[data-layout=_r] > div[data-v-fb28b5be],\r\n[data-layout=_r] > article[data-v-fb28b5be],\r\n[data-layout=_r] > aside[data-v-fb28b5be] {\r\n    padding: 0 1rem 1rem 1rem;\n}\n[data-layout=_r] img[data-v-fb28b5be] {\r\n    height: auto;\n}\na.btn[data-v-fb28b5be],\r\nbutton[data-v-fb28b5be] {\r\n    background-color: #4d36bd;\r\n    color: white;\r\n    text-decoration: none;\r\n    display: inline-block;\r\n    padding: 1em;\r\n    border-radius: 5px;\r\n    border: none;\r\n    font-family: sans-serif;\r\n    font-size: 1em;\r\n    cursor: pointer;\n}\na.btn[data-v-fb28b5be]:hover,\r\nbutton[data-v-fb28b5be]:hover {\r\n    -webkit-filter: brightness(1.1);\r\n            filter: brightness(1.1);\n}\r\n/*Accordion Generic*/\r\n /*탭 배경사진*/\n.AP_accordion_panel[data-v-fb28b5be] {\r\n    overflow: hidden;\r\n    -webkit-transition: height 0.3s;\r\n    transition: height 0.3s;\r\n    position: relative;\r\n    width: 88%;\n}\n.AP_accordion_tab[data-v-fb28b5be] {\r\n    width: 88%;\r\n    height: 60px;\r\n    cursor: pointer;\r\n    margin: 0;\r\n    line-height: 1;\r\n    padding-top: 25px;\r\n    font-weight: bold;\r\n    position: relative;\r\n    font-size: 2.8em;\r\n    color: rgba(255, 255, 255, 0.5);\r\n    font-style: oblique; /* italic */\r\n    letter-spacing: -3px;\n}\n.AP_accordion_tab.open[data-v-fb28b5be] {\r\n    -webkit-filter: brightness(1.05);\r\n            filter: brightness(1.05);\n}\n.AP_accordion_tab.open[data-v-fb28b5be]:after {\r\n    -webkit-transform: rotateZ(180deg);\r\n            transform: rotateZ(180deg);\n}\n.AP_accordion_tab[data-v-fb28b5be]:hover {\r\n    -webkit-filter: brightness(1.1);\r\n            filter: brightness(1.1);\n}\n.AP_accordion_tab[data-v-fb28b5be]:after {\r\n    position: absolute;\r\n    font-size: 1.4em;\r\n    right: 0;\r\n    /* line-height: 1; */\r\n    top: 0;\r\n    height: 100%;\r\n    width: 88%;\r\n    display: -webkit-box;\r\n    display: flex;\r\n    -webkit-box-align: center;\r\n            align-items: center;\r\n    -webkit-box-pack: center;\r\n            justify-content: center;\n}\r\n/* Accordion1 */\n.MOD_ACCORDION1 .AP_accordion[data-v-fb28b5be] {\r\n    margin: 0;\r\n    max-width: 100%;\n}\n.MOD_ACCORDION1_Intro[data-v-fb28b5be] {\r\n    max-width: 100%;\r\n    margin-bottom: 2rem;\n}\r\n", ""]);
+exports.push([module.i, "\n.body[data-v-fb28b5be] {margin-top: 13%;margin-left: 8%;height: auto;}\n.mem1[data-v-fb28b5be],\r\n.mem2[data-v-fb28b5be],\r\n.mem3[data-v-fb28b5be],\r\n.mem4[data-v-fb28b5be],\r\n.mem5[data-v-fb28b5be],\r\n.mem6[data-v-fb28b5be] {\r\n    width: 100%;\n}\n.intro[data-v-fb28b5be] {\r\n    background-color: transparent;\r\n    border: 0px solid transparent;\r\n    border-bottom: 2px solid white;\r\n    color: #fff;\n}\n#member_member1Image[data-v-fb28b5be],\r\n#member_member2Image[data-v-fb28b5be],\r\n#member_member3Image[data-v-fb28b5be],\r\n#member_member4Image[data-v-fb28b5be],\r\n#member_member5Image[data-v-fb28b5be],\r\n#member_member6Image[data-v-fb28b5be] {width: 20%;float: inherit}\n#member_member1Hidden[data-v-fb28b5be] {\r\n    background-color: rgba(0, 0, 0, 0.7);\r\n    text-align: center;\r\n    color: white;\r\n    font-size: 20px;\r\n    position: relative;\r\n    z-index: 100;\r\n    margin-top: -73%;\r\n    padding-top: 20%;\r\n    padding-bottom: 20%;\n}\n#member_member1Hidden .ok-button[data-v-fb28b5be], .cancel-button[data-v-fb28b5be] {\r\n    color: white;\r\n    background-color: transparent;\r\n    border: 0px;\r\n\tborder: 2px solid #fff;\r\n\tborder-radius: 6px;\r\n    margin-top: 3%;\r\n\tpadding: 3px;\r\n    font-size: 15px;\r\n    cursor: pointer;\n}\n.ok-button[data-v-fb28b5be]:hover {\r\n    background-color: #fff;\r\n    color: #000;\n}\n.cancel-button[data-v-fb28b5be]:hover {\r\n    background-color: #fff;\r\n    color: #000;\n}\n[data-theme*=_bgp1][data-v-fb28b5be] {\r\n    /* background: url(/image/bird.jpg); */\r\n    background: -webkit-gradient(linear, left top, right top, from(rgba(0, 0, 0, 0)), color-stop(70%, rgba(0, 0, 0, 1))), url(/image/bird.jpg);\r\n    background: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1) 70%), url(/image/bird.jpg);\r\n    background-repeat: no-repeat;\r\n    /* background-image: linear-gradient(to right, rgba(255,0,0,0), rgba(255,0,0,1)); */\r\n    color: white;\n}\n[data-theme*=_bgp2][data-v-fb28b5be] {\r\n    /* background: url(/image/cat.jpg); */\r\n    background: -webkit-gradient(linear, left top, right top, from(rgba(0, 0, 0, 0)), color-stop(70%, rgba(0, 0, 0, 1))), url(/image/cat.jpg);\r\n    background: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1) 70%), url(/image/cat.jpg);\r\n    background-repeat: no-repeat;\r\n    color: white;\n}\n[data-theme*=_bgp3][data-v-fb28b5be] {\r\n    /* background: url(/image/tiger.jpg); */\r\n    background: -webkit-gradient(linear, left top, right top, from(rgba(255, 255, 255, 0)), color-stop(70%, rgba(0, 0, 0, 1))), url(/image/tiger.jpg);\r\n    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(0, 0, 0, 1) 70%), url(/image/tiger.jpg);\r\n    background-repeat: no-repeat;\r\n    color: white;\n}\n[data-theme*=_bgp4][data-v-fb28b5be] {\r\n    /* background: url(/image/hed.jpg); */\r\n    background: -webkit-gradient(linear, left top, right top, from(rgba(255, 255, 255, 0)), color-stop(70%, rgba(0, 0, 0, 1))), url(/image/hed.jpg);\r\n    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(0, 0, 0, 1) 70%), url(/image/hed.jpg);\r\n    background-repeat: no-repeat;\r\n    color: white;\n}\n[data-theme*=_bgp5][data-v-fb28b5be] {\r\n    /* background: url(/image/lion.jpg); */\r\n    background: -webkit-gradient(linear, left top, right top, from(rgba(255, 255, 255, 0)), color-stop(70%, rgba(0, 0, 0, 1))), url(/image/lion.jpg);\r\n    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(0, 0, 0, 1) 70%), url(/image/lion.jpg);\r\n    background-repeat: no-repeat;\r\n    color: white;\n}\n[data-theme*=_bgp6][data-v-fb28b5be] {\r\n    /* background: url(/image/dog.jpg); */\r\n    background: -webkit-gradient(linear, left top, right top, from(rgba(255, 255, 255, 0)), color-stop(70%, rgba(0, 0, 0, 1))), url(/image/dog.jpg);\r\n    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(0, 0, 0, 1) 70%), url(/image/dog.jpg);\r\n    background-repeat: no-repeat;\r\n    color: white;\n}\n[data-layout=_r][data-v-fb28b5be] {\r\n    max-width: 100%;\r\n    margin-left: 3%;\r\n    /*margin: 0 auto;*/\r\n    /*    padding: 2rem 1rem;*/\n}\n[data-layout=_r] > div[data-v-fb28b5be],\r\n[data-layout=_r] > article[data-v-fb28b5be],\r\n[data-layout=_r] > aside[data-v-fb28b5be] {\r\n    padding: 0 1rem 1rem 1rem;\n}\n[data-layout=_r] img[data-v-fb28b5be] {\r\n    height: auto;\n}\na.btn[data-v-fb28b5be],\r\nbutton[data-v-fb28b5be] {\r\n    background-color: #4d36bd;\r\n    color: white;\r\n    text-decoration: none;\r\n    display: inline-block;\r\n    padding: 1em;\r\n    border-radius: 5px;\r\n    border: none;\r\n    font-family: sans-serif;\r\n    font-size: 1em;\r\n    cursor: pointer;\n}\na.btn[data-v-fb28b5be]:hover,\r\nbutton[data-v-fb28b5be]:hover {\r\n    -webkit-filter: brightness(1.1);\r\n            filter: brightness(1.1);\n}\r\n/*Accordion Generic*/\r\n /*탭 배경사진*/\n.AP_accordion_panel[data-v-fb28b5be] {\r\n    overflow: hidden;\r\n    -webkit-transition: height 0.3s;\r\n    transition: height 0.3s;\r\n    position: relative;\r\n    width: 88%;\n}\n.AP_accordion_tab[data-v-fb28b5be] {\r\n    width: 88%;\r\n    height: 60px;\r\n    cursor: pointer;\r\n    margin: 0;\r\n    line-height: 1;\r\n    padding-top: 25px;\r\n    font-weight: bold;\r\n    position: relative;\r\n    font-size: 2.8em;\r\n    color: rgba(255, 255, 255, 0.5);\r\n    font-style: oblique; /* italic */\r\n    letter-spacing: -3px;\n}\n.AP_accordion_tab.open[data-v-fb28b5be] {\r\n    -webkit-filter: brightness(1.05);\r\n            filter: brightness(1.05);\n}\n.AP_accordion_tab.open[data-v-fb28b5be]:after {\r\n    -webkit-transform: rotateZ(180deg);\r\n            transform: rotateZ(180deg);\n}\n.AP_accordion_tab[data-v-fb28b5be]:hover {\r\n    -webkit-filter: brightness(1.1);\r\n            filter: brightness(1.1);\n}\n.AP_accordion_tab[data-v-fb28b5be]:after {\r\n    position: absolute;\r\n    font-size: 1.4em;\r\n    right: 0;\r\n    /* line-height: 1; */\r\n    top: 0;\r\n    height: 100%;\r\n    width: 88%;\r\n    display: -webkit-box;\r\n    display: flex;\r\n    -webkit-box-align: center;\r\n            align-items: center;\r\n    -webkit-box-pack: center;\r\n            justify-content: center;\n}\r\n/* Accordion1 */\n.MOD_ACCORDION1 .AP_accordion[data-v-fb28b5be] {\r\n    margin: 0;\r\n    max-width: 100%;\n}\n.MOD_ACCORDION1_Intro[data-v-fb28b5be] {\r\n    max-width: 100%;\r\n    margin-bottom: 2rem;\n}\r\n", ""]);
 
 // exports
 
@@ -7715,7 +7781,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.body[data-v-1f2b8e6e] {margin-top: 13%;margin-left: 8%;height: auto}\n.mem1[data-v-1f2b8e6e],\r\n.mem2[data-v-1f2b8e6e],\r\n.mem3[data-v-1f2b8e6e],\r\n.mem4[data-v-1f2b8e6e],\r\n.mem5[data-v-1f2b8e6e],\r\n.mem6[data-v-1f2b8e6e] {\r\n    width: 100%;\n}\n#member_member1Image[data-v-1f2b8e6e],\r\n#member_member2Image[data-v-1f2b8e6e],\r\n#member_member3Image[data-v-1f2b8e6e],\r\n#member_member4Image[data-v-1f2b8e6e],\r\n#member_member5Image[data-v-1f2b8e6e],\r\n#member_member6Image[data-v-1f2b8e6e] {width: 20%;float: inherit}\n#member_member1Hidden[data-v-1f2b8e6e] {\r\n    background-color: rgba(0, 0, 0, 0.7);\r\n    text-align: center;\r\n    color: white;\r\n    font-size: 20px;\r\n    position: relative;\r\n    z-index: 100;\r\n    margin-top: -73%;\r\n    padding-top: 20%;\r\n    padding-bottom: 20%;\n}\n#member_member2Hidden[data-v-1f2b8e6e] {\r\n    background-color: rgba(0, 0, 0, 0.7);\r\n    text-align: center;\r\n    color: white;\r\n    font-size: 20px;\r\n    position: relative;\r\n    z-index: 100;\r\n    margin-top: -73%;\r\n    padding-top: 20%;\r\n    padding-bottom: 20%;\n}\n#member_member3Hidden[data-v-1f2b8e6e] {\r\n    background-color: rgba(0, 0, 0, 0.7);\r\n    text-align: center;\r\n    color: white;\r\n    font-size: 20px;\r\n    position: relative;\r\n    z-index: 100;\r\n    margin-top: -73%;\r\n    padding-top: 20%;\r\n    padding-bottom: 20%;\n}\n#member_member4Hidden[data-v-1f2b8e6e] {\r\n    background-color: rgba(0, 0, 0, 0.7);\r\n    text-align: center;\r\n    color: white;\r\n    font-size: 20px;\r\n    position: relative;\r\n    z-index: 100;\r\n    margin-top: -73%;\r\n    padding-top: 20%;\r\n    padding-bottom: 20%;\n}\n#member_member5Hidden[data-v-1f2b8e6e] {\r\n    background-color: rgba(0, 0, 0, 0.7);\r\n    text-align: center;\r\n    color: white;\r\n    font-size: 20px;\r\n    position: relative;\r\n    z-index: 100;\r\n    margin-top: -73%;\r\n    padding-top: 20%;\r\n    padding-bottom: 20%;\n}\n#member_member6Hidden[data-v-1f2b8e6e] {\r\n    background-color: rgba(0, 0, 0, 0.7);\r\n    text-align: center;\r\n    color: white;\r\n    font-size: 20px;\r\n    position: relative;\r\n    z-index: 100;\r\n    margin-top: -73%;\r\n    padding-top: 20%;\r\n    padding-bottom: 20%;\n}\n#member_member1Hidden input[data-v-1f2b8e6e] {margin: 1%}\n[data-theme*=_bgp1][data-v-1f2b8e6e] {\r\n    /* background: url(/image/bird.jpg); */\r\n    background: -webkit-gradient(linear, left top, right top, from(rgba(0, 0, 0, 0)), color-stop(70%, rgba(0, 0, 0, 1))), url(/image/bird.jpg);\r\n    background: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1) 70%), url(/image/bird.jpg);\r\n    background-repeat: no-repeat;\r\n    /* background-image: linear-gradient(to right, rgba(255,0,0,0), rgba(255,0,0,1)); */\r\n    color: white;\n}\n[data-theme*=_bgp2][data-v-1f2b8e6e] {\r\n    /* background: url(/image/cat.jpg); */\r\n    background: -webkit-gradient(linear, left top, right top, from(rgba(0, 0, 0, 0)), color-stop(70%, rgba(0, 0, 0, 1))), url(/image/cat.jpg);\r\n    background: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1) 70%), url(/image/cat.jpg);\r\n    background-repeat: no-repeat;\r\n    color: white;\n}\n[data-theme*=_bgp3][data-v-1f2b8e6e] {\r\n    /* background: url(/image/tiger.jpg); */\r\n    background: -webkit-gradient(linear, left top, right top, from(rgba(255, 255, 255, 0)), color-stop(70%, rgba(0, 0, 0, 1))), url(/image/tiger.jpg);\r\n    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(0, 0, 0, 1) 70%), url(/image/tiger.jpg);\r\n    background-repeat: no-repeat;\r\n    color: white;\n}\n[data-theme*=_bgp4][data-v-1f2b8e6e] {\r\n    /* background: url(/image/hed.jpg); */\r\n    background: -webkit-gradient(linear, left top, right top, from(rgba(255, 255, 255, 0)), color-stop(70%, rgba(0, 0, 0, 1))), url(/image/hed.jpg);\r\n    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(0, 0, 0, 1) 70%), url(/image/hed.jpg);\r\n    background-repeat: no-repeat;\r\n    color: white;\n}\n[data-theme*=_bgp5][data-v-1f2b8e6e] {\r\n    /* background: url(/image/lion.jpg); */\r\n    background: -webkit-gradient(linear, left top, right top, from(rgba(255, 255, 255, 0)), color-stop(70%, rgba(0, 0, 0, 1))), url(/image/lion.jpg);\r\n    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(0, 0, 0, 1) 70%), url(/image/lion.jpg);\r\n    background-repeat: no-repeat;\r\n    color: white;\n}\n[data-theme*=_bgp6][data-v-1f2b8e6e] {\r\n    /* background: url(/image/dog.jpg); */\r\n    background: -webkit-gradient(linear, left top, right top, from(rgba(255, 255, 255, 0)), color-stop(70%, rgba(0, 0, 0, 1))), url(/image/dog.jpg);\r\n    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(0, 0, 0, 1) 70%), url(/image/dog.jpg);\r\n    background-repeat: no-repeat;\r\n    color: white;\n}\n[data-layout=_r][data-v-1f2b8e6e] {\r\n    max-width: 100%;\r\n    margin-left: 3%;\r\n    /*margin: 0 auto;*/\r\n    /*    padding: 2rem 1rem;*/\n}\n[data-layout=_r] > div[data-v-1f2b8e6e],\r\n[data-layout=_r] > article[data-v-1f2b8e6e],\r\n[data-layout=_r] > aside[data-v-1f2b8e6e] {\r\n    padding: 0 1rem 1rem 1rem;\n}\n[data-layout=_r] img[data-v-1f2b8e6e] {\r\n    height: auto;\n}\na.btn[data-v-1f2b8e6e],\r\nbutton[data-v-1f2b8e6e] {\r\n    background-color: #4d36bd;\r\n    color: white;\r\n    text-decoration: none;\r\n    display: inline-block;\r\n    padding: 1em;\r\n    border-radius: 5px;\r\n    border: none;\r\n    font-family: sans-serif;\r\n    font-size: 1em;\r\n    cursor: pointer;\n}\na.btn[data-v-1f2b8e6e]:hover,\r\nbutton[data-v-1f2b8e6e]:hover {\r\n    -webkit-filter: brightness(1.1);\r\n            filter: brightness(1.1);\n}\r\n/*Accordion Generic*/\r\n /*탭 배경사진*/\n.AP_accordion_panel[data-v-1f2b8e6e] {\r\n    overflow: hidden;\r\n    -webkit-transition: height 0.3s;\r\n    transition: height 0.3s;\r\n    position: relative;\r\n    width: 88%;\n}\n.AP_accordion_tab[data-v-1f2b8e6e] {\r\n    width: 88%;\r\n    height: 60px;\r\n    cursor: pointer;\r\n    margin: 0;\r\n    line-height: 1;\r\n    padding-top: 25px;\r\n    font-weight: bold;\r\n    position: relative;\r\n    font-size: 2.8em;\r\n    color: rgba(255, 255, 255, 0.5);\r\n    font-style: oblique; /* italic */\r\n    letter-spacing: -3px;\n}\n.AP_accordion_tab.open[data-v-1f2b8e6e] {\r\n    -webkit-filter: brightness(1.05);\r\n            filter: brightness(1.05);\n}\n.AP_accordion_tab.open[data-v-1f2b8e6e]:after {\r\n    -webkit-transform: rotateZ(180deg);\r\n            transform: rotateZ(180deg);\n}\n.AP_accordion_tab[data-v-1f2b8e6e]:hover {\r\n    -webkit-filter: brightness(1.1);\r\n            filter: brightness(1.1);\n}\n.AP_accordion_tab[data-v-1f2b8e6e]:after {\r\n    position: absolute;\r\n    font-size: 1.4em;\r\n    right: 0;\r\n    /* line-height: 1; */\r\n    top: 0;\r\n    height: 100%;\r\n    width: 88%;\r\n    display: -webkit-box;\r\n    display: flex;\r\n    -webkit-box-align: center;\r\n            align-items: center;\r\n    -webkit-box-pack: center;\r\n            justify-content: center;\n}\r\n/* Accordion1 */\n.MOD_ACCORDION1 .AP_accordion[data-v-1f2b8e6e] {\r\n    margin: 0;\r\n    max-width: 100%;\n}\n.MOD_ACCORDION1_Intro[data-v-1f2b8e6e] {\r\n    max-width: 100%;\r\n    margin-bottom: 2rem;\n}\r\n", ""]);
+exports.push([module.i, "\n.body[data-v-1f2b8e6e] {margin-top: 13%;margin-left: 8%;height: auto}\n.mem1[data-v-1f2b8e6e],\r\n.mem2[data-v-1f2b8e6e],\r\n.mem3[data-v-1f2b8e6e],\r\n.mem4[data-v-1f2b8e6e],\r\n.mem5[data-v-1f2b8e6e],\r\n.mem6[data-v-1f2b8e6e] {\r\n    width: 100%;\n}\n.intro[data-v-1f2b8e6e] {\r\n    background-color: transparent;\r\n    border: 0px solid transparent;\r\n    border-bottom: 2px solid white;\r\n    color: #fff;\n}\n#member_member1Image[data-v-1f2b8e6e],\r\n#member_member2Image[data-v-1f2b8e6e],\r\n#member_member3Image[data-v-1f2b8e6e],\r\n#member_member4Image[data-v-1f2b8e6e],\r\n#member_member5Image[data-v-1f2b8e6e],\r\n#member_member6Image[data-v-1f2b8e6e] {width: 20%;float: inherit}\n#member_member1Hidden[data-v-1f2b8e6e] {\r\n    background-color: rgba(0, 0, 0, 0.7);\r\n    text-align: center;\r\n    color: white;\r\n    font-size: 20px;\r\n    position: relative;\r\n    z-index: 100;\r\n    margin-top: -73%;\r\n    padding-top: 20%;\r\n    padding-bottom: 20%;\n}\n#member_member1Hidden .ok-button[data-v-1f2b8e6e], .cancel-button[data-v-1f2b8e6e] {\r\n    color: white;\r\n    background-color: transparent;\r\n    border: 0px;\r\n\tborder: 2px solid #fff;\r\n\tborder-radius: 6px;\r\n    margin-top: 3%;\r\n\tpadding: 3px;\r\n    font-size: 15px;\r\n    cursor: pointer;\n}\n.ok-button[data-v-1f2b8e6e]:hover {\r\n    background-color: #fff;\r\n    color: #000;\n}\n.cancel-button[data-v-1f2b8e6e]:hover {\r\n    background-color: #fff;\r\n    color: #000;\n}\n[data-theme*=_bgp1][data-v-1f2b8e6e] {\r\n    /* background: url(/image/bird.jpg); */\r\n    background: -webkit-gradient(linear, left top, right top, from(rgba(0, 0, 0, 0)), color-stop(70%, rgba(0, 0, 0, 1))), url(/image/bird.jpg);\r\n    background: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1) 70%), url(/image/bird.jpg);\r\n    background-repeat: no-repeat;\r\n    /* background-image: linear-gradient(to right, rgba(255,0,0,0), rgba(255,0,0,1)); */\r\n    color: white;\n}\n[data-theme*=_bgp2][data-v-1f2b8e6e] {\r\n    /* background: url(/image/cat.jpg); */\r\n    background: -webkit-gradient(linear, left top, right top, from(rgba(0, 0, 0, 0)), color-stop(70%, rgba(0, 0, 0, 1))), url(/image/cat.jpg);\r\n    background: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1) 70%), url(/image/cat.jpg);\r\n    background-repeat: no-repeat;\r\n    color: white;\n}\n[data-theme*=_bgp3][data-v-1f2b8e6e] {\r\n    /* background: url(/image/tiger.jpg); */\r\n    background: -webkit-gradient(linear, left top, right top, from(rgba(255, 255, 255, 0)), color-stop(70%, rgba(0, 0, 0, 1))), url(/image/tiger.jpg);\r\n    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(0, 0, 0, 1) 70%), url(/image/tiger.jpg);\r\n    background-repeat: no-repeat;\r\n    color: white;\n}\n[data-theme*=_bgp4][data-v-1f2b8e6e] {\r\n    /* background: url(/image/hed.jpg); */\r\n    background: -webkit-gradient(linear, left top, right top, from(rgba(255, 255, 255, 0)), color-stop(70%, rgba(0, 0, 0, 1))), url(/image/hed.jpg);\r\n    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(0, 0, 0, 1) 70%), url(/image/hed.jpg);\r\n    background-repeat: no-repeat;\r\n    color: white;\n}\n[data-theme*=_bgp5][data-v-1f2b8e6e] {\r\n    /* background: url(/image/lion.jpg); */\r\n    background: -webkit-gradient(linear, left top, right top, from(rgba(255, 255, 255, 0)), color-stop(70%, rgba(0, 0, 0, 1))), url(/image/lion.jpg);\r\n    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(0, 0, 0, 1) 70%), url(/image/lion.jpg);\r\n    background-repeat: no-repeat;\r\n    color: white;\n}\n[data-theme*=_bgp6][data-v-1f2b8e6e] {\r\n    /* background: url(/image/dog.jpg); */\r\n    background: -webkit-gradient(linear, left top, right top, from(rgba(255, 255, 255, 0)), color-stop(70%, rgba(0, 0, 0, 1))), url(/image/dog.jpg);\r\n    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(0, 0, 0, 1) 70%), url(/image/dog.jpg);\r\n    background-repeat: no-repeat;\r\n    color: white;\n}\n[data-layout=_r][data-v-1f2b8e6e] {\r\n    max-width: 100%;\r\n    margin-left: 3%;\r\n    /*margin: 0 auto;*/\r\n    /*    padding: 2rem 1rem;*/\n}\n[data-layout=_r] > div[data-v-1f2b8e6e],\r\n[data-layout=_r] > article[data-v-1f2b8e6e],\r\n[data-layout=_r] > aside[data-v-1f2b8e6e] {\r\n    padding: 0 1rem 1rem 1rem;\n}\n[data-layout=_r] img[data-v-1f2b8e6e] {\r\n    height: auto;\n}\na.btn[data-v-1f2b8e6e],\r\nbutton[data-v-1f2b8e6e] {\r\n    background-color: #4d36bd;\r\n    color: white;\r\n    text-decoration: none;\r\n    display: inline-block;\r\n    padding: 1em;\r\n    border-radius: 5px;\r\n    border: none;\r\n    font-family: sans-serif;\r\n    font-size: 1em;\r\n    cursor: pointer;\n}\na.btn[data-v-1f2b8e6e]:hover,\r\nbutton[data-v-1f2b8e6e]:hover {\r\n    -webkit-filter: brightness(1.1);\r\n            filter: brightness(1.1);\n}\r\n/*Accordion Generic*/\r\n /*탭 배경사진*/\n.AP_accordion_panel[data-v-1f2b8e6e] {\r\n    overflow: hidden;\r\n    -webkit-transition: height 0.3s;\r\n    transition: height 0.3s;\r\n    position: relative;\r\n    width: 88%;\n}\n.AP_accordion_tab[data-v-1f2b8e6e] {\r\n    width: 88%;\r\n    height: 60px;\r\n    cursor: pointer;\r\n    margin: 0;\r\n    line-height: 1;\r\n    padding-top: 25px;\r\n    font-weight: bold;\r\n    position: relative;\r\n    font-size: 2.8em;\r\n    color: rgba(255, 255, 255, 0.5);\r\n    font-style: oblique; /* italic */\r\n    letter-spacing: -3px;\n}\n.AP_accordion_tab.open[data-v-1f2b8e6e] {\r\n    -webkit-filter: brightness(1.05);\r\n            filter: brightness(1.05);\n}\n.AP_accordion_tab.open[data-v-1f2b8e6e]:after {\r\n    -webkit-transform: rotateZ(180deg);\r\n            transform: rotateZ(180deg);\n}\n.AP_accordion_tab[data-v-1f2b8e6e]:hover {\r\n    -webkit-filter: brightness(1.1);\r\n            filter: brightness(1.1);\n}\n.AP_accordion_tab[data-v-1f2b8e6e]:after {\r\n    position: absolute;\r\n    font-size: 1.4em;\r\n    right: 0;\r\n    /* line-height: 1; */\r\n    top: 0;\r\n    height: 100%;\r\n    width: 88%;\r\n    display: -webkit-box;\r\n    display: flex;\r\n    -webkit-box-align: center;\r\n            align-items: center;\r\n    -webkit-box-pack: center;\r\n            justify-content: center;\n}\r\n/* Accordion1 */\n.MOD_ACCORDION1 .AP_accordion[data-v-1f2b8e6e] {\r\n    margin: 0;\r\n    max-width: 100%;\n}\n.MOD_ACCORDION1_Intro[data-v-1f2b8e6e] {\r\n    max-width: 100%;\r\n    margin-bottom: 2rem;\n}\r\n", ""]);
 
 // exports
 
@@ -40709,8 +40775,10 @@ var render = function() {
                           }
                         }),
                         _c("br"),
-                        _vm._v("\n                                이름 : "),
-                        _c("p", [_vm._v("하잇!")]),
+                        _vm._v(" "),
+                        _c("p", { staticStyle: { "margin-top": "1%" } }, [
+                          _vm._v("이름 : " + _vm._s(_vm.user_name))
+                        ]),
                         _vm._v(" "),
                         _vm._v("\n                                소개 : "),
                         _c("input", {
@@ -40722,6 +40790,8 @@ var render = function() {
                               expression: "member_info"
                             }
                           ],
+                          staticClass: "intro",
+                          staticStyle: { "margin-top": "1%" },
                           attrs: {
                             type: "text",
                             placeholder: "소개글 작성하기"
@@ -40740,18 +40810,29 @@ var render = function() {
                         _c("br"),
                         _vm._v("\n                                이미지 : "),
                         _c("input", {
-                          attrs: { id: "image", type: "file" },
+                          staticStyle: { "margin-top": "1%", width: "20%" },
+                          attrs: {
+                            id: "image",
+                            type: "file",
+                            accept: "image/*"
+                          },
                           on: { change: _vm.onImageChange }
                         }),
                         _vm._v(" "),
                         _c("br"),
                         _vm._v(" "),
                         _c("input", {
-                          attrs: { type: "button", value: "생성하기", id: "1" },
+                          staticClass: "ok-button",
+                          attrs: {
+                            type: "button",
+                            value: "생성하기",
+                            id: _vm.user_name
+                          },
                           on: { click: _vm.create }
                         }),
                         _vm._v(" "),
                         _c("input", {
+                          staticClass: "cancel-button",
                           attrs: { type: "button", value: "뒤로가기" },
                           on: { click: _vm.back }
                         })
@@ -40806,14 +40887,14 @@ var render = function() {
                         staticClass: "AP_accordion_tab",
                         attrs: {
                           role: "tab",
-                          "data-theme": "_bgp1",
+                          "data-theme": "_bgp" + member.user_id,
                           tabindex: "0"
                         }
                       },
                       [
                         _vm._v(
                           " " +
-                            _vm._s(member.id) +
+                            _vm._s(member.user.id) +
                             ". " +
                             _vm._s(member.user.name)
                         )
@@ -40829,7 +40910,9 @@ var render = function() {
                       [
                         _c("img", {
                           staticClass: "mem1",
-                          attrs: { src: "/image/bird.jpg" }
+                          attrs: {
+                            src: "/image/" + _vm.image[member.user_id - 1]
+                          }
                         }),
                         _vm._v(" "),
                         _c("div", { attrs: { id: "member_member1Hidden" } }, [
@@ -40837,37 +40920,53 @@ var render = function() {
                             attrs: {
                               src: "images/" + member.imagename,
                               id: "member_member1Image",
-                              alt: "조원사진"
+                              alt: "조원사진",
+                              width: "100",
+                              height: "100"
                             }
                           }),
                           _c("br"),
-                          _vm._v("\n                                이름 : "),
-                          _c("p", { attrs: { id: "member_member1Name" } }, [
-                            _vm._v(" " + _vm._s(member.user.name))
-                          ]),
-                          _vm._v("\n                                소개 : "),
-                          _c("p", { attrs: { id: "member_member1Intro" } }, [
-                            _vm._v(" " + _vm._s(member.member_info))
-                          ]),
+                          _vm._v(" "),
+                          _c(
+                            "p",
+                            {
+                              staticStyle: { "margin-top": "1%" },
+                              attrs: { id: "member_member1Name" }
+                            },
+                            [_vm._v("이름 : " + _vm._s(member.user.name))]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "p",
+                            {
+                              staticStyle: { "margin-top": "1%" },
+                              attrs: { id: "member_member1Intro" }
+                            },
+                            [_vm._v("소개 : " + _vm._s(member.member_info))]
+                          ),
                           _vm._v(" "),
                           _c("div", [
-                            _c("input", {
-                              attrs: {
-                                type: "button",
-                                value: "수정하기",
-                                id: member.id
-                              },
-                              on: { click: _vm.update }
-                            }),
+                            member.user_id == _vm.check
+                              ? _c("input", {
+                                  attrs: {
+                                    type: "button",
+                                    value: "수정하기",
+                                    id: _vm.user_name
+                                  },
+                                  on: { click: _vm.update }
+                                })
+                              : _vm._e(),
                             _vm._v(" "),
-                            _c("input", {
-                              attrs: {
-                                type: "button",
-                                value: "삭제하기",
-                                id: member.id
-                              },
-                              on: { click: _vm.destroy }
-                            })
+                            member.user_id == _vm.check
+                              ? _c("input", {
+                                  attrs: {
+                                    type: "button",
+                                    value: "삭제하기",
+                                    id: _vm.user_name
+                                  },
+                                  on: { click: _vm.destroy }
+                                })
+                              : _vm._e()
                           ])
                         ])
                       ]
@@ -40875,20 +40974,22 @@ var render = function() {
                   ])
                 }),
                 _vm._v(" "),
-                _c(
-                  "p",
-                  {
-                    staticClass: "AP_accordion_tab",
-                    attrs: {
-                      role: "tab",
-                      "data-theme": "_bgp2",
-                      tabindex: "0",
-                      id: "1"
-                    },
-                    on: { click: _vm.create }
-                  },
-                  [_vm._v("생성하기")]
-                )
+                _vm.check == 0 && _vm.admin == "admin"
+                  ? _c(
+                      "p",
+                      {
+                        staticClass: "AP_accordion_tab",
+                        attrs: {
+                          role: "tab",
+                          "data-theme": "_bgp2",
+                          tabindex: "0",
+                          id: _vm.user_name
+                        },
+                        on: { click: _vm.create }
+                      },
+                      [_vm._v("생성하기")]
+                    )
+                  : _vm._e()
               ],
               2
             )
@@ -40951,15 +41052,33 @@ var render = function() {
                     }),
                     _vm._v(" "),
                     _c("div", { attrs: { id: "member_member1Hidden" } }, [
-                      _c("img", {
-                        attrs: {
-                          src: "/images/" + _vm.member.imagename,
-                          id: "member_member1Image"
-                        }
-                      }),
+                      _vm.check == 1
+                        ? _c("img", {
+                            attrs: {
+                              src: "/images/" + _vm.member.imagename,
+                              id: "member_member1Image",
+                              width: "100",
+                              height: "100"
+                            }
+                          })
+                        : _vm._e(),
                       _c("br"),
-                      _vm._v("\n                                이름 : "),
-                      _c("p", [_vm._v(_vm._s(_vm.member.user.name))]),
+                      _vm._v(" "),
+                      _vm.check == 0
+                        ? _c("img", {
+                            attrs: {
+                              src: _vm.uploadImageFile,
+                              id: "member_member1Image",
+                              width: "100",
+                              height: "100"
+                            }
+                          })
+                        : _vm._e(),
+                      _c("br"),
+                      _vm._v(" "),
+                      _c("p", { staticStyle: { "margin-top": "1%" } }, [
+                        _vm._v("이름 : " + _vm._s(_vm.user_name))
+                      ]),
                       _vm._v("\n                                소개 : "),
                       _c("input", {
                         directives: [
@@ -40970,6 +41089,8 @@ var render = function() {
                             expression: "member_info"
                           }
                         ],
+                        staticClass: "intro",
+                        staticStyle: { "margin-top": "1%" },
                         attrs: {
                           type: "text",
                           placeholder: _vm.member.member_info
@@ -40988,18 +41109,25 @@ var render = function() {
                       _c("br"),
                       _vm._v("\n                                이미지 : "),
                       _c("input", {
-                        attrs: { type: "file", id: _vm.member.id },
+                        staticStyle: { "margin-top": "1%", width: "20%" },
+                        attrs: {
+                          type: "file",
+                          accept: "image/*",
+                          id: _vm.member.id
+                        },
                         on: { change: _vm.onImageChange }
                       }),
                       _vm._v(" "),
                       _c("br"),
                       _vm._v(" "),
                       _c("input", {
+                        staticClass: "ok-button",
                         attrs: { type: "button", value: "수정하기" },
                         on: { click: _vm.update }
                       }),
                       _vm._v(" "),
                       _c("input", {
+                        staticClass: "cancel-button",
                         attrs: { type: "button", value: "뒤로가기" },
                         on: { click: _vm.back }
                       })
@@ -41389,7 +41517,7 @@ var render = function() {
         )
       : _vm._e(),
     _vm._v(" "),
-    _vm.button_control == 1
+    (_vm.button_control == 1) | (_vm.user.admin == "admin")
       ? _c("button", { on: { click: _vm.deleteQnA } }, [_vm._v("삭제")])
       : _vm._e()
   ])

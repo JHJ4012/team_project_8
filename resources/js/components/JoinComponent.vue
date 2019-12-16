@@ -40,7 +40,7 @@
                         <div class="form-group">
                             <button>가입</button>
                             <button v-on:click="back">취소</button>
-                        </div>  
+                        </div>   
                     </form>
                 </div>
             </div>
@@ -52,19 +52,19 @@ export default {
     mounted() {
             console.log('Component mounted.')
     },
-    data() {
+data() {
         return{
             user_id : '',
             password : '',
             name : '',
             email : '',
             sex : '',
-            message: ''
+            message : '',
         }
     },
     methods : {
         postUser(e) {
-            e.preventDefault();
+            e.preventDefault(); //선택된 요소의 기본 동작을 실행하는 것을 막음
             let currentObj = this;
             Axios.post('/api/join',{
                 user_id : this.user_id,
@@ -83,9 +83,6 @@ export default {
                     alert('회원가입되었습니다.')
                     this.$router.push('/login')
                 }
-            })
-            .catch(error => {
-                console.log(error)
             });
         },
         back(){

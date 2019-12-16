@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Qna;
 use App\Reply;
 use Auth;
+use App\User;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 class QnaController extends Controller
@@ -55,7 +56,8 @@ class QnaController extends Controller
         $added_view = $qna->find($id)->view + 1;    //조회수 증가시키기 위함.
         $qna->find($id)->update(['view' => $added_view]);
         $session = new Session();
-        return response()->json(['qna'=>Qna::where('id',$id)->get(), 'reply'=>Reply::where('qna_id', $id)->get(), 'user'=> $session->get('user')]);
+        $userId = $session->get('user');
+        return response()->json(['qna'=>Qna::where('id',$id)->get(), 'reply'=>Reply::where('qna_id', $id)->get(), 'user'=> $userId, 'admin'=>User::where('user_id', $userId)->get()]);
     }
 
     public function edit($id)

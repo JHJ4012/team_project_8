@@ -23,7 +23,7 @@
         </div>
         <button v-on:click="goBackList" style="margin-right: 3%">목록</button>
         <button v-on:click = "updateQnA" style="margin-right: 3%" v-if="button_control == 1">수정</button>
-        <button v-on:click ="deleteQnA" v-if="button_control == 1">삭제</button>
+        <button v-on:click ="deleteQnA" v-if="button_control == 1 | user.admin == 'admin'">삭제</button>
     </div>
 </template>
 
@@ -36,7 +36,8 @@ export default {
             answers : '',
             view_reply : '',
             button_control : '',
-            token_exist : $cookies.isKey('_token')
+            token_exist : $cookies.isKey('_token'),
+            user : ''
         };
     },
     mounted() {
@@ -45,6 +46,7 @@ export default {
         .then(response => {
             this.qna = response.data.qna[0]
             this.answers = response.data.reply
+            this.user = response.data.admin[0]
             if(this.qna.user_id == response.data.user)
             {
                 this.button_control = 1

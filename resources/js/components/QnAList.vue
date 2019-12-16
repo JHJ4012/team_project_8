@@ -57,7 +57,7 @@ export default {
 		getResults(page=1){
 			axios.get('/api/qna?page=' + page)
 			.then(response => {
-				this.page = page
+				this.page = page;
 				this.qnas = response.data;
 			})
 			.catch(err => {

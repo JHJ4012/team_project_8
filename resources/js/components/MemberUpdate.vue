@@ -9,12 +9,13 @@
                             <div class="AP_accordion_panel" role="tabpanel"> <!-- 화면 상에 보여지는 탭 -->
                                 <img src="/image/bird.jpg" class="mem1"> <!-- 탭 클릭했을 때 보이는 조원1의 배경사진 -->
                                 <div id="member_member1Hidden"> <!-- 탭을 클릭 했을 때 보이는 조원1의 사진, 이름, 한줄소개 -->
-                                    <img :src="'/images/'+member.imagename" id="member_member1Image"><br />
-                                    이름 : <p>{{ member.user.name }}</p>
-                                    소개 : <input type="text" v-model="member_info" :placeholder="member.member_info"> <br />
-                                    이미지 : <input type="file" v-on:change="onImageChange" :id="member.id"> <br />
-                                    <input type="button" value="수정하기" @click="update">
-                                    <input type="button" value="뒤로가기" @click="back">
+                                    <img v-if="check == 1" :src="'/images/'+member.imagename" id="member_member1Image" width="100" height="100"><br />
+                                    <img v-if="check == 0" :src="uploadImageFile" id="member_member1Image" width="100" height="100"><br />
+                                    <p style="margin-top: 1%">이름 : {{ user_name }}</p>
+                                    소개 : <input type="text" v-model="member_info" :placeholder="member.member_info" class="intro" style="margin-top: 1%"> <br />
+                                    이미지 : <input type="file" accept="image/*" v-on:change="onImageChange" :id="member.id" style="margin-top: 1%; width: 20%"> <br />
+                                    <input type="button" value="수정하기" @click="update" class="ok-button">
+                                    <input type="button" value="뒤로가기" @click="back" class="cancel-button">
                                 </div>
                             </div>
                         </div>
@@ -31,14 +32,18 @@ export default {
             member : { user :{ name : '로딩중' }, imagename : '로딩중', member_info : '로딩중' }, // 시간차 렌더
             member_info : '',
             image :'',
+            user_name : this.$route.params.user_name,
+            uploadImageFile : '',
+            check : 1,
+            click : true
         }
     },
     mounted() {
-        const user_id = this.$route.params.user_id;
-        Axios.get(`/api/member/${user_id}`)
+        const user_name = this.user_name;
+        Axios.get(`/api/member/${user_name}`)
         .then(res => 
         {
-            this.member=res.data.member[0]
+            this.member=res.data.member
         })
         .catch(err=> {
             console.log(err)
@@ -49,31 +54,57 @@ export default {
             this.$router.push('/member')
         },
         update(e) {
-            let config = {
-                headers: {
-                    processData: true, 
-                    contentType: "multipart/form-data", 
+            if (this.click){
+                this.click = false
+                
+                let config = {
+                    headers: {
+                        processData: true, 
+                        contentType: "multipart/form-data", 
+                    }
+                } 
+                const form = new FormData()
+                const user_name = this.user_name
+                const member_info = this.member_info
+                const image = this.image
+                form.append('_method', 'patch')
+                form.append('user_name', user_name)
+                if(member_info) {
+                    form.append('member_info', member_info)
+                } else {
+                    form.append('member_info', '없음')
                 }
-            } 
-            const form = new FormData()
-            const id = this.$route.params.user_id
-            const member_info = this.member_info
-            const image = this.image
-            form.append('_method', 'patch')
-            form.append('id', id)
-            form.append('member_info', member_info)
-            form.append('image',image)
-            Axios.post(`/api/member/${id}`, form, config)
-            .then(res => {
-                this.$router.push('/member')
-            })
-            .catch(err => {
-                console.log(err)
-            });
+                if(image) {
+                    form.append('image',image)
+                } else {
+                    form.append('image', '없음')
+                }
+                Axios.post(`/api/member/${user_name}`, form, config)
+                .then(res => {
+                    this.$router.push('/member')
+                })
+                .catch(err => {
+                    console.log(err)
+                });
+            }
         },
         onImageChange(e){ // 이미지 파일 찾아내기
             this.image = e.target.files[0]
-            console.log(e.target.files[0])
+            var input = e.target.files;
+            this.check = 0
+            var filesArr = Array.prototype.slice.call(input);
+            filesArr.forEach((f)=> {
+            if(!f.type.match("image.*")) {
+                alert("확장자는 이미지 확장자만 가능합니다.");
+                return;
+            }
+
+            var reader = new FileReader();
+            reader.readAsDataURL(f);
+            reader.onload = (e) => {
+                this.uploadImageFile = e.target.result;
+            }
+        });
         }
     }
 }
@@ -89,6 +120,14 @@ export default {
 .mem6 {
     width: 100%;
 }
+
+.intro {
+    background-color: transparent;
+    border: 0px solid transparent;
+    border-bottom: 2px solid white;
+    color: #fff;
+}
+
 #member_member1Image,
 #member_member2Image,
 #member_member3Image,
@@ -106,62 +145,29 @@ export default {
     padding-top: 20%;
     padding-bottom: 20%;
 }
-#member_member2Hidden {
-    background-color: rgba(0, 0, 0, 0.7);
-    text-align: center;
+
+#member_member1Hidden .ok-button, .cancel-button {
     color: white;
-    font-size: 20px;
-    position: relative;
-    z-index: 100;
-    margin-top: -73%;
-    padding-top: 20%;
-    padding-bottom: 20%;
+    background-color: transparent;
+    border: 0px;
+	border: 2px solid #fff;
+	border-radius: 6px;
+    margin-top: 3%;
+	padding: 3px;
+    font-size: 15px;
+    cursor: pointer;
 }
-#member_member3Hidden {
-    background-color: rgba(0, 0, 0, 0.7);
-    text-align: center;
-    color: white;
-    font-size: 20px;
-    position: relative;
-    z-index: 100;
-    margin-top: -73%;
-    padding-top: 20%;
-    padding-bottom: 20%;
+
+.ok-button:hover {
+    background-color: #fff;
+    color: #000;
 }
-#member_member4Hidden {
-    background-color: rgba(0, 0, 0, 0.7);
-    text-align: center;
-    color: white;
-    font-size: 20px;
-    position: relative;
-    z-index: 100;
-    margin-top: -73%;
-    padding-top: 20%;
-    padding-bottom: 20%;
+
+.cancel-button:hover {
+    background-color: #fff;
+    color: #000;
 }
-#member_member5Hidden {
-    background-color: rgba(0, 0, 0, 0.7);
-    text-align: center;
-    color: white;
-    font-size: 20px;
-    position: relative;
-    z-index: 100;
-    margin-top: -73%;
-    padding-top: 20%;
-    padding-bottom: 20%;
-}
-#member_member6Hidden {
-    background-color: rgba(0, 0, 0, 0.7);
-    text-align: center;
-    color: white;
-    font-size: 20px;
-    position: relative;
-    z-index: 100;
-    margin-top: -73%;
-    padding-top: 20%;
-    padding-bottom: 20%;
-}
-#member_member1Hidden input {margin: 1%}
+
 [data-theme*=_bgp1] {
     /* background: url(/image/bird.jpg); */
     background: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1) 70%), url(/image/bird.jpg);

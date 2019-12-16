@@ -26,7 +26,7 @@ export default {
     },
     methods : {
         postQnA(e) {
-            e.preventDefault();
+            e.preventDefault(); //선택된 요소의 기본 동작을 실행하는 것을 막음
             let currentObj = this;
             if(this.$route.params.title && this.$route.params.question){
                 Axios.patch('/api/qna/' + this.$route.params.id, {
