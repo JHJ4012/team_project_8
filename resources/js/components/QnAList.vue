@@ -50,13 +50,11 @@ export default {
 	},
 	methods: {
 		clickQnA(qnaObj){ //각 qna를 클릭했을 때
-			console.log(qnaObj.id)
 			this.$router.push({name : "QnAView", params : {id : qnaObj.id}});
 		},
 		getResults(page=1){  //페이징 기능
 			axios.get('/api/qna?page=' + page)
          .then(response => {
-            console.log(response)
 				this.page = page
 				this.qnas = response.data;
 			});

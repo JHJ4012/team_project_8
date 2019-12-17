@@ -1,15 +1,15 @@
 <template>
     <div class="all">
         <div class="body">
-            <div class="btn-group" id="menu">
+            <div class="btn-group">
                 <!-- week1 ~ week7 버튼 -->
-                <button class="mocean-modal-button" data-mocean-type="slide-in-top" id="japan_week1" onclick="new_button.style.visibility = 'visible'" v-on:click="clickWeek(1)">week 1</button>
-                <button class="mocean-modal-button" data-mocean-type="slide-in-right" onclick="new_button.style.visibility = 'visible'" id="japan_week2" v-on:click="clickWeek(2)">week 2</button>
-                <button class="mocean-modal-button" data-mocean-type="slide-in-bottom" onclick="new_button.style.visibility = 'visible'" id="japan_week3" v-on:click="clickWeek(3)">week 3</button>
-                <button class="mocean-modal-button" data-mocean-type="slide-in-left" id="japan_week4" onclick="new_button.style.visibility = 'visible'" v-on:click="clickWeek(4)">week 4</button>
-                <button class="mocean-modal-button" data-mocean-type="slide-in-top" onclick="new_button.style.visibility = 'visible'" data-mocean-out-type="slide-out-bottom" id="japan_week5" v-on:click="clickWeek(5)" >week 5</button>
-                <button class="mocean-modal-button" data-mocean-type="slide-in-bottom" onclick="new_button.style.visibility = 'visible'" data-mocean-out-type="slide-out-top" id="japan_week6" v-on:click="clickWeek(6)">week 6</button>
-                <button class="mocean-modal-button" data-mocean-type="slide-in-left" onclick="new_button.style.visibility = 'visible'" data-mocean-out-type="slide-out-right" id="japan_week7" v-on:click="clickWeek(7)">week 7</button>
+                <button data-mocean-type="slide-in-top" id="japan_week1" onclick="new_button.style.visibility = 'visible'" v-on:click="clickWeek(1)">week 1</button>
+                <button data-mocean-type="slide-in-right" onclick="new_button.style.visibility = 'visible'" id="japan_week2" v-on:click="clickWeek(2)">week 2</button>
+                <button data-mocean-type="slide-in-bottom" onclick="new_button.style.visibility = 'visible'" id="japan_week3" v-on:click="clickWeek(3)">week 3</button>
+                <button data-mocean-type="slide-in-left" id="japan_week4" onclick="new_button.style.visibility = 'visible'" v-on:click="clickWeek(4)">week 4</button>
+                <button data-mocean-type="slide-in-top" onclick="new_button.style.visibility = 'visible'" data-mocean-out-type="slide-out-bottom" id="japan_week5" v-on:click="clickWeek(5)" >week 5</button>
+                <button data-mocean-type="slide-in-bottom" onclick="new_button.style.visibility = 'visible'" data-mocean-out-type="slide-out-top" id="japan_week6" v-on:click="clickWeek(6)">week 6</button>
+                <button data-mocean-type="slide-in-left" onclick="new_button.style.visibility = 'visible'" data-mocean-out-type="slide-out-right" id="japan_week7" v-on:click="clickWeek(7)">week 7</button>
             </div>
             <button @click="goCreate(week)" v-if="button_control == 1" id = "new_button" style="visibility: hidden">새로 만들기</button>
             <div class="japan_hiddenIntro">
@@ -36,9 +36,6 @@ export default {
             token_exist : $cookies.isKey('_token'),
         };
     },
-    mounted: function(){
- 
-    },
     methods: {
         clickWeek(weekId){
             console.log(weekId);
@@ -53,7 +50,6 @@ export default {
                 if(response.data.user == 'admin')
                 {
                     this.button_control = 1
-                    
                 }
             })
             .catch(error =>{

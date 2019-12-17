@@ -60,7 +60,7 @@ const router = new VueRouter({
             path : '/member/create', // 생성하기
             name : 'MemberCreate',
             component : MemberCreate,
-            props : true
+            props : true    //파라미터 받을 수 있게 설정
         },
         {
             path : '/member/update', // 수정하기
@@ -115,4 +115,4 @@ const app = new Vue({
     render : (h) => h(Parent)
 });
 
-Vue.prototype.$EventBus = new Vue();
+Vue.prototype.$EventBus = new Vue();    //컴포넌트간 통신을 하기 위해서

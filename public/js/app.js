@@ -1849,9 +1849,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
     'navigation': _NaviComponent_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
-  },
-  mounted: function mounted() {
-    console.log('Component mounted.');
   }
 });
 
@@ -1903,7 +1900,6 @@ __webpack_require__.r(__webpack_exports__);
       token_exist: $cookies.isKey('_token')
     };
   },
-  mounted: function mounted() {},
   methods: {
     clickWeek: function clickWeek(weekId) {
       var _this = this;
@@ -1990,11 +1986,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      // japan: '',
       info: '',
       newImage: '',
       title: '',
@@ -2004,19 +1998,11 @@ __webpack_require__.r(__webpack_exports__);
   mounted: function mounted() {
     var _this = this;
 
-    console.log('Component  JapanModifyComponent Vue mounted.');
-    console.log(this.$route.params.id);
     Axios.get('/api/japan/modify/' + this.$route.params.id).then(function (response) {
-      console.log('update response'); // this.japan = response.data.japans
-
-      console.log(response.data.japans);
       _this.info = response.data.japans[0].info;
       _this.newImage = response.data.japans[0].image;
       _this.title = response.data.japans[0].title;
       _this.week = response.data.japans[0].week;
-      console.log(_this.info);
-      console.log(_this.newImage);
-      console.log(_this.week);
     })["catch"](function (error) {
       console.log(error);
     });
@@ -2033,8 +2019,6 @@ __webpack_require__.r(__webpack_exports__);
       var filesArr = Array.prototype.slice.call(files);
       vm.newImage = e.target.files[0];
       this.newImage = e.target.files[0];
-      console.log(this.newImage);
-      console.log(vm.newImage);
       filesArr.forEach(function (f) {
         if (!f.type.match("image.*")) {
           alert("확장자는 이미지 확장자만 가능합니다.");
@@ -2062,12 +2046,6 @@ __webpack_require__.r(__webpack_exports__);
       var _this2 = this;
 
       e.preventDefault();
-      console.log('submit updateJapan');
-      console.log(this.newImage);
-      console.log(this.info);
-      console.log(this.$route.params.id);
-      console.log(this.week);
-      console.log(this.title);
       var config = {
         headers: {
           processData: true,
@@ -2080,20 +2058,12 @@ __webpack_require__.r(__webpack_exports__);
       var info = this.info;
       var image = this.newImage;
       var title = this.title;
-      console.log(image);
       form.append('_method', 'patch');
       form.append('week', week);
       form.append('info', info);
       form.append('image', image);
-      form.append('title', title); //   title : this.title,
-      //                 week : this.week,
-      //                 info : this.info,
-      //                 image : this.newImage
-
+      form.append('title', title);
       Axios.post('/api/japan/' + this.$route.params.id, form, config).then(function (response) {
-        console.log('업데이트 응답');
-        console.log(response.data.msg);
-
         _this2.$router.go(-1);
       })["catch"](function (error) {
         console.log(error);
@@ -2163,9 +2133,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 /* harmony default export */ __webpack_exports__["default"] = ({
-  mounted: function mounted() {
-    console.log('Component mounted.');
-  },
   data: function data() {
     return {
       user_id: '',
@@ -2189,8 +2156,6 @@ __webpack_require__.r(__webpack_exports__);
         email: this.email,
         password: this.password
       }).then(function (response) {
-        console.log(response);
-
         if (response.data.error === '1') {
           _this.message = '아이디가 중복됩니다.';
         } else if (response.data.error === '2') {
@@ -2254,8 +2219,6 @@ __webpack_require__.r(__webpack_exports__);
     title: ''
   },
   mounted: function mounted() {
-    console.log('Component JpnCreateComponent Vue mounted.');
-    console.log(this.$route.params.week);
     this.week = this.$route.params.week;
     /* 사진 업로드 시 미리보기 */
 
@@ -2270,8 +2233,6 @@ __webpack_require__.r(__webpack_exports__);
       var filesArr = Array.prototype.slice.call(files);
       vm.image = e.target.files[0];
       this.image = e.target.files[0];
-      console.log("image check");
-      console.log(this.image);
       filesArr.forEach(function (f) {
         if (!f.type.match("image.*")) {
           alert("확장자는 이미지 확장자만 가능합니다.");
@@ -2300,9 +2261,6 @@ __webpack_require__.r(__webpack_exports__);
 
       e.preventDefault();
       var currentObj = this;
-      console.log(this.info);
-      console.log(this.week);
-      console.log(this.image);
       var config = {
         headers: {
           processData: true,
@@ -2320,8 +2278,6 @@ __webpack_require__.r(__webpack_exports__);
       form.append('image', image);
       form.append('title', title);
       Axios.post('/api/japan', form, config).then(function (response) {
-        console.log(response.data.msg);
-
         _this.$router.go(-1);
       })["catch"](function (error) {
         console.log(error);
@@ -2412,50 +2368,6 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/MainComponent.vue?vue&type=script&lang=js&":
-/*!************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/MainComponent.vue?vue&type=script&lang=js& ***!
-  \************************************************************************************************************************************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-/* harmony default export */ __webpack_exports__["default"] = ({
-  mounted: function mounted() {
-    console.log('Component mounted.');
-  }
-});
-
-/***/ }),
-
 /***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/MemberCreate.vue?vue&type=script&lang=js&":
 /*!***********************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/MemberCreate.vue?vue&type=script&lang=js& ***!
@@ -2503,9 +2415,6 @@ __webpack_require__.r(__webpack_exports__);
       click: true
     };
   },
-  mounted: function mounted() {
-    console.log('Component mounted.');
-  },
   methods: {
     back: function back() {
       this.$router.push('/member');
@@ -2515,21 +2424,19 @@ __webpack_require__.r(__webpack_exports__);
 
       // 이미지 파일 찾아내기
       this.image = e.target.files[0];
-      var input = e.target.files;
-      var filesArr = Array.prototype.slice.call(input);
-      filesArr.forEach(function (f) {
-        if (!f.type.match("image.*")) {
-          alert("확장자는 이미지 확장자만 가능합니다.");
-          return;
-        }
+      var input = e.target.files[0];
 
-        var reader = new FileReader();
-        reader.readAsDataURL(f);
+      if (!input.type.match("image.*")) {
+        alert("확장자는 이미지 확장자만 가능합니다.");
+        return;
+      }
 
-        reader.onload = function (e) {
-          _this.uploadImageFile = e.target.result;
-        };
-      });
+      var reader = new FileReader();
+      reader.readAsDataURL(input); //FileReader의 내장 메서드 : 파일을 읽으면 요청 파일의 데이터 URI를 result에 담아서 보내줌
+
+      reader.onload = function (e) {
+        _this.uploadImageFile = e.target.result;
+      };
     },
     create: function create(e) {
       var _this2 = this;
@@ -2628,7 +2535,6 @@ __webpack_require__.r(__webpack_exports__);
 
     this.image = ['bird.jpg', 'cat.jpg', 'tiger.jpg', 'hed.jpg', 'lion.jpg', 'dog.jpg'];
     Axios.get("/api/member").then(function (res) {
-      // console.log(res);
       _this.members = res.data.member;
       _this.user_name = res.data.user_name[0].name;
       _this.admin = res.data.admin[0].admin;
@@ -2738,7 +2644,6 @@ __webpack_require__.r(__webpack_exports__);
 
     var user_name = this.user_name;
     Axios.get("/api/member/".concat(user_name)).then(function (res) {
-      console.log(res);
       _this.member = res.data.member;
     })["catch"](function (err) {
       console.log(err);
@@ -2763,8 +2668,7 @@ __webpack_require__.r(__webpack_exports__);
         var user_name = this.user_name;
         var member_info = this.member_info;
         var image = this.image;
-        form.append('_method', 'patch'); //이것을 안하면 이미지 파일 정보가 전송 안됨. html에서는 put이나 patch 지원 안함
-        //그래서 http 방식으로 보내기 위해서 이렇게 함.
+        form.append('_method', 'patch'); //form태그에서는 put이랑 get밖에 지원을 안해서 patch를 사용하기 위해서 사용했다.
 
         form.append('user_name', user_name);
 
@@ -2792,22 +2696,20 @@ __webpack_require__.r(__webpack_exports__);
 
       // 이미지 파일 찾아내기
       this.image = e.target.files[0];
-      var input = e.target.files;
+      var input = e.target.files[0];
       this.check = 0;
-      var filesArr = Array.prototype.slice.call(input);
-      filesArr.forEach(function (f) {
-        if (!f.type.match("image.*")) {
-          alert("확장자는 이미지 확장자만 가능합니다.");
-          return;
-        }
 
-        var reader = new FileReader();
-        reader.readAsDataURL(f);
+      if (!input.type.match("image.*")) {
+        alert("확장자는 이미지 확장자만 가능합니다.");
+        return;
+      }
 
-        reader.onload = function (e) {
-          _this3.uploadImageFile = e.target.result;
-        };
-      });
+      var reader = new FileReader();
+      reader.readAsDataURL(input);
+
+      reader.onload = function (e) {
+        _this3.uploadImageFile = e.target.result;
+      };
     }
   }
 });
@@ -2911,7 +2813,8 @@ __webpack_require__.r(__webpack_exports__);
       var _this = this;
 
       //완료 눌렀을 때.
-      e.preventDefault();
+      e.preventDefault(); //e.preventDefault -> submit으로 인한 페이지 이동을 막기 위해
+
       var currentObj = this;
 
       if (this.$route.params.title && this.$route.params.question) {
@@ -3009,7 +2912,6 @@ __webpack_require__.r(__webpack_exports__);
   methods: {
     clickQnA: function clickQnA(qnaObj) {
       //각 qna를 클릭했을 때
-      console.log(qnaObj.id);
       this.$router.push({
         name: "QnAView",
         params: {
@@ -3023,7 +2925,6 @@ __webpack_require__.r(__webpack_exports__);
       var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
       //페이징 기능
       axios.get('/api/qna?page=' + page).then(function (response) {
-        console.log(response);
         _this.page = page;
         _this.qnas = response.data;
       });
@@ -3093,10 +2994,8 @@ __webpack_require__.r(__webpack_exports__);
   mounted: function mounted() {
     var _this = this;
 
-    console.log('Component mounted.');
     Axios.get('/api/qna/' + this.$route.params.id) //QnAList에서 파라미터로 보낸 id를 통해 해당 QnA 정보 가져오기
     .then(function (response) {
-      // console.log(response)
       _this.qna = response.data.qna[0];
       _this.answers = response.data.reply;
 
@@ -3149,8 +3048,6 @@ __webpack_require__.r(__webpack_exports__);
         qna_id: this.$route.params.id,
         reply: this.view_reply
       }).then(function (response) {
-        console.log(response);
-
         _this3.filter(response.data.reply); //댓글을 생성했을 때 화면 이동없이 바로 값을 바꿔주기 위해 filter라는 메서드를 연결한다
 
       })["catch"](function (error) {
@@ -40529,11 +40426,10 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "all" }, [
     _c("div", { staticClass: "body" }, [
-      _c("div", { staticClass: "btn-group", attrs: { id: "menu" } }, [
+      _c("div", { staticClass: "btn-group" }, [
         _c(
           "button",
           {
-            staticClass: "mocean-modal-button",
             attrs: {
               "data-mocean-type": "slide-in-top",
               id: "japan_week1",
@@ -40551,7 +40447,6 @@ var render = function() {
         _c(
           "button",
           {
-            staticClass: "mocean-modal-button",
             attrs: {
               "data-mocean-type": "slide-in-right",
               onclick: "new_button.style.visibility = 'visible'",
@@ -40569,7 +40464,6 @@ var render = function() {
         _c(
           "button",
           {
-            staticClass: "mocean-modal-button",
             attrs: {
               "data-mocean-type": "slide-in-bottom",
               onclick: "new_button.style.visibility = 'visible'",
@@ -40587,7 +40481,6 @@ var render = function() {
         _c(
           "button",
           {
-            staticClass: "mocean-modal-button",
             attrs: {
               "data-mocean-type": "slide-in-left",
               id: "japan_week4",
@@ -40605,7 +40498,6 @@ var render = function() {
         _c(
           "button",
           {
-            staticClass: "mocean-modal-button",
             attrs: {
               "data-mocean-type": "slide-in-top",
               onclick: "new_button.style.visibility = 'visible'",
@@ -40624,7 +40516,6 @@ var render = function() {
         _c(
           "button",
           {
-            staticClass: "mocean-modal-button",
             attrs: {
               "data-mocean-type": "slide-in-bottom",
               onclick: "new_button.style.visibility = 'visible'",
@@ -40643,7 +40534,6 @@ var render = function() {
         _c(
           "button",
           {
-            staticClass: "mocean-modal-button",
             attrs: {
               "data-mocean-type": "slide-in-left",
               onclick: "new_button.style.visibility = 'visible'",
@@ -41218,9 +41108,7 @@ var render = function() {
         { staticClass: "new" },
         [
           _c("router-link", { attrs: { to: "/join" } }, [
-            _c("a", { attrs: { href: "/../join" } }, [
-              _vm._v("아직 회원이 아니신가요?")
-            ])
+            _vm._v("아직 회원이 아니신가요?")
           ])
         ],
         1
@@ -41745,7 +41633,7 @@ var render = function() {
         : _vm._e(),
       _vm._v(" "),
       _vm.token_exist == false
-        ? _c("a", { attrs: { href: "/../login" } }, [_vm._v("로그인")])
+        ? _c("a", { attrs: { href: "/login" } }, [_vm._v("로그인")])
         : _vm._e()
     ])
   ])
@@ -41762,11 +41650,11 @@ var staticRenderFns = [
       _vm._v(" "),
       _c("div", { staticClass: "navi" }, [
         _c("div", { attrs: { id: "navibar" } }, [
-          _c("a", { attrs: { href: "/../member" } }, [_vm._v("조원소개")]),
+          _c("a", { attrs: { href: "/member" } }, [_vm._v("조원소개")]),
           _vm._v(" "),
-          _c("a", { attrs: { href: "/../japan" } }, [_vm._v("현지학기제")]),
+          _c("a", { attrs: { href: "/japan" } }, [_vm._v("현지학기제")]),
           _vm._v(" "),
-          _c("a", { attrs: { href: "/../qna" } }, [_vm._v("QnA")])
+          _c("a", { attrs: { href: "/qna" } }, [_vm._v("QnA")])
         ])
       ])
     ])
@@ -57202,7 +57090,8 @@ var router = new VueRouter({
     // 생성하기
     name: 'MemberCreate',
     component: _components_MemberCreate__WEBPACK_IMPORTED_MODULE_5__["default"],
-    props: true
+    props: true //파라미터 받을 수 있게 설정
+
   }, {
     path: '/member/update',
     // 수정하기
@@ -57249,7 +57138,7 @@ var app = new Vue({
     return h(_components_App__WEBPACK_IMPORTED_MODULE_0__["default"]);
   }
 });
-Vue.prototype.$EventBus = new Vue();
+Vue.prototype.$EventBus = new Vue(); //컴포넌트간 통신을 하기 위해서
 
 /***/ }),
 
@@ -57812,19 +57701,17 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _MainComponent_vue_vue_type_template_id_3ee370e9_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./MainComponent.vue?vue&type=template&id=3ee370e9&scoped=true& */ "./resources/js/components/MainComponent.vue?vue&type=template&id=3ee370e9&scoped=true&");
-/* harmony import */ var _MainComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./MainComponent.vue?vue&type=script&lang=js& */ "./resources/js/components/MainComponent.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport *//* harmony import */ var _MainComponent_vue_vue_type_style_index_0_id_3ee370e9_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./MainComponent.vue?vue&type=style&index=0&id=3ee370e9&scoped=true&lang=css& */ "./resources/js/components/MainComponent.vue?vue&type=style&index=0&id=3ee370e9&scoped=true&lang=css&");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _MainComponent_vue_vue_type_style_index_0_id_3ee370e9_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./MainComponent.vue?vue&type=style&index=0&id=3ee370e9&scoped=true&lang=css& */ "./resources/js/components/MainComponent.vue?vue&type=style&index=0&id=3ee370e9&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
-
-
+var script = {}
 
 
 
 /* normalize component */
 
-var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
-  _MainComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  script,
   _MainComponent_vue_vue_type_template_id_3ee370e9_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
   _MainComponent_vue_vue_type_template_id_3ee370e9_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
   false,
@@ -57838,20 +57725,6 @@ var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_
 if (false) { var api; }
 component.options.__file = "resources/js/components/MainComponent.vue"
 /* harmony default export */ __webpack_exports__["default"] = (component.exports);
-
-/***/ }),
-
-/***/ "./resources/js/components/MainComponent.vue?vue&type=script&lang=js&":
-/*!****************************************************************************!*\
-  !*** ./resources/js/components/MainComponent.vue?vue&type=script&lang=js& ***!
-  \****************************************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_MainComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib??ref--4-0!../../../node_modules/vue-loader/lib??vue-loader-options!./MainComponent.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/MainComponent.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_MainComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
 
 /***/ }),
 

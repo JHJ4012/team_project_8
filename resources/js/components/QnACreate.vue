@@ -26,7 +26,7 @@ export default {
     },
     methods : {
         postQnA(e) {        //완료 눌렀을 때.
-            e.preventDefault();
+            e.preventDefault(); //e.preventDefault -> submit으로 인한 페이지 이동을 막기 위해
             let currentObj = this;
             if(this.$route.params.title && this.$route.params.question){    //수정을 하기 위한 것
                 Axios.patch('/api/qna/' + this.$route.params.id, {

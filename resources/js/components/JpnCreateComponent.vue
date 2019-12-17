@@ -14,7 +14,7 @@
                         </div>
                     </div>
                     <div>
-                        <input type="file" id="input_img" accept="image/*" />
+                        <input type="file" id="input_img" accept="image/*"/>
                     </div>
                 </div>
             </div>
@@ -32,8 +32,6 @@ export default {
         title: '',
     },
     mounted() {
-        console.log('Component JpnCreateComponent Vue mounted.')
-        console.log(this.$route.params.week)
         this.week = this.$route.params.week
         /* 사진 업로드 시 미리보기 */
         var sel_file;
@@ -48,8 +46,6 @@ export default {
             vm.image = e.target.files[0]
 
             this.image = e.target.files[0]
-            console.log("image check")
-            console.log(this.image)
             filesArr.forEach(function(f) {
                 if(!f.type.match("image.*")) {
                     alert("확장자는 이미지 확장자만 가능합니다.");
@@ -75,9 +71,6 @@ export default {
         postJapan(e){
             e.preventDefault();
             let currentObj = this;
-            console.log(this.info)
-            console.log(this.week)
-            console.log(this.image)
             let config = {
                 headers: {
                     processData: true, 
@@ -98,7 +91,6 @@ export default {
            
             Axios.post('/api/japan', form, config)
             .then(response=>{
-                console.log(response.data.msg)
                 this.$router.go(-1)
             })
             .catch(error=>{

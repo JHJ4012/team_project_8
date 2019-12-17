@@ -25,15 +25,6 @@
     </div>
 </template>
 
-<script>
-    export default {
-        mounted() {
-            console.log('Component mounted.')
-        }
-    }
-</script>
-
-
 <style scoped>
 .body h1 {
     margin: 0;

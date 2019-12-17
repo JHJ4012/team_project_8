@@ -6,16 +6,16 @@
             </div>
             <div class="navi">
                 <div id="navibar">
-                    <a href="/../member">조원소개</a>
-                    <a href="/../japan">현지학기제</a>
-                    <a href="/../qna">QnA</a>
+                    <a href="/member">조원소개</a>
+                    <a href="/japan">현지학기제</a>
+                    <a href="/qna">QnA</a>
                 </div>
         </div>
             
         </div>
         <div class="navilog" id="navilog">
             <a href="#"  @click="logout" v-if="token_exist == true">로그아웃</a>
-            <a href="/../login" v-if="token_exist == false">로그인</a>
+            <a href="/login" v-if="token_exist == false">로그인</a>
         </div>
     </div>
 

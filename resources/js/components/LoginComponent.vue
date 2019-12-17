@@ -25,7 +25,7 @@
                 </form>
             </div>
             <div class="new">
-                <router-link to = "/join"><a href="/../join">아직 회원이 아니신가요?</a></router-link>
+                <router-link to = "/join">아직 회원이 아니신가요?</router-link>
             </div>
         </div>
     </div>

@@ -46,7 +46,6 @@ export default {
         Axios.get("/api/member")
         .then(res => 
         {
-            // console.log(res);
             this.members=res.data.member
             this.user_name=res.data.user_name[0].name
             this.admin=res.data.admin[0].admin

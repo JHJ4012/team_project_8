@@ -9,9 +9,6 @@ import Navigation from './NaviComponent.vue'
     export default {
         components: {
             'navigation' : Navigation
-        },
-        mounted() {
-            console.log('Component mounted.')
         }
     }
 </script>

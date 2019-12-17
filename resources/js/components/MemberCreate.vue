@@ -37,29 +37,23 @@ export default {
             click : true,
         }
     },
-    mounted() {
-        console.log('Component mounted.')
-    },
     methods: {
         back() {
             this.$router.push('/member')
         },
         onImageChange(e){ // 이미지 파일 찾아내기
             this.image = e.target.files[0]
-            var input = e.target.files;
-            var filesArr = Array.prototype.slice.call(input);
-            filesArr.forEach((f)=> {
-                if(!f.type.match("image.*")) {
-                    alert("확장자는 이미지 확장자만 가능합니다.");
-                    return;
-                }
+            var input = e.target.files[0];
+            if(!input.type.match("image.*")) {
+                alert("확장자는 이미지 확장자만 가능합니다.");
+                return;
+            }
 
-                var reader = new FileReader();
-                reader.readAsDataURL(f);
-                reader.onload = (e) => {
-                    this.uploadImageFile = e.target.result;
-                }
-            });
+            var reader = new FileReader();
+            reader.readAsDataURL(input);    //FileReader의 내장 메서드 : 파일을 읽으면 요청 파일의 데이터 URI를 result에 담아서 보내줌
+            reader.onload = (e) => {
+                this.uploadImageFile = e.target.result;
+            }
         },
         create(e) { // 생성하기 및 수정하기
             if (this.click){    //버튼 중복 클릭 되지 않게 하기 위해

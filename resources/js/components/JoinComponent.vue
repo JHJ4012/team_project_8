@@ -49,10 +49,7 @@
 </template>
 <script>
 export default {
-    mounted() {
-            console.log('Component mounted.')
-    },
-data() {
+    data() {
         return{
             user_id : '',
             password : '',
@@ -74,7 +71,6 @@ data() {
                 password : this.password,
             })
             .then(response => {
-                console.log(response)
                 if(response.data.error === '1') {
                     this.message = '아이디가 중복됩니다.'
                 }else if(response.data.error === '2') {

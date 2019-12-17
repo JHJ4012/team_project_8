@@ -43,7 +43,6 @@ export default {
         Axios.get(`/api/member/${user_name}`)
         .then(res => 
         {
-            console.log(res)
             this.member=res.data.member
         })
         .catch(err=> {
@@ -68,8 +67,7 @@ export default {
                 const user_name = this.user_name
                 const member_info = this.member_info
                 const image = this.image
-                form.append('_method', 'patch') //이것을 안하면 이미지 파일 정보가 전송 안됨. html에서는 put이나 patch 지원 안함
-                                                //그래서 http 방식으로 보내기 위해서 이렇게 함.
+                form.append('_method', 'patch') //form태그에서는 put이랑 get밖에 지원을 안해서 patch를 사용하기 위해서 사용했다.
                 form.append('user_name', user_name)
                 if(member_info) {
                     form.append('member_info', member_info)
@@ -92,21 +90,17 @@ export default {
         },
         onImageChange(e){ // 이미지 파일 찾아내기
             this.image = e.target.files[0]
-            var input = e.target.files;
+            var input = e.target.files[0];
             this.check = 0
-            var filesArr = Array.prototype.slice.call(input);
-            filesArr.forEach((f)=> {
-            if(!f.type.match("image.*")) {
+            if(!input.type.match("image.*")) {
                 alert("확장자는 이미지 확장자만 가능합니다.");
                 return;
             }
-
             var reader = new FileReader();
-            reader.readAsDataURL(f);
+            reader.readAsDataURL(input);
             reader.onload = (e) => {
                 this.uploadImageFile = e.target.result;
             }
-        });
         }
     }
 }

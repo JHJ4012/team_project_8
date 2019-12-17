@@ -40,10 +40,8 @@ export default {
         };
     },
     mounted() {
-        console.log('Component mounted.')
         Axios.get('/api/qna/' + this.$route.params.id)  //QnAList에서 파라미터로 보낸 id를 통해 해당 QnA 정보 가져오기
         .then(response => {
-            // console.log(response)
             this.qna = response.data.qna[0]
             this.answers = response.data.reply
             if(response.data.admin[0]){ //로그인 되어 있는 상태면 true로 되어 작동할 것. 로그아웃이면 값이 없기 때문에 작동 안함
@@ -83,7 +81,6 @@ export default {
                 reply : this.view_reply
             })
             .then(response => {
-                console.log(response)
                 this.filter(response.data.reply)    //댓글을 생성했을 때 화면 이동없이 바로 값을 바꿔주기 위해 filter라는 메서드를 연결한다
             })
             .catch(error=>{

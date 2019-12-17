@@ -18,7 +18,6 @@
                 </div>
             </div>
             <button id = "ok_modify">수정</button>
-            <!-- <input type="button" value="완료" id="ok_modify"/> -->
         </form>
     </div>
 </template>
@@ -26,7 +25,6 @@
 export default {
     data(){
         return {
-            // japan: '',
             info: '',
             newImage : '',
             title : '',
@@ -34,26 +32,16 @@ export default {
         }
     },
     mounted() {
-        console.log('Component  JapanModifyComponent Vue mounted.')
-        console.log(this.$route.params.id)
         Axios.get('/api/japan/modify/' + this.$route.params.id)
         .then((response) => {
-            console.log('update response')
-            // this.japan = response.data.japans
-            console.log(response.data.japans)
             this.info = response.data.japans[0].info
             this.newImage = response.data.japans[0].image
             this.title = response.data.japans[0].title
             this.week = response.data.japans[0].week
-            console.log(this.info)
-            console.log(this.newImage)
-            console.log(this.week)
         })
         .catch(error => {
             console.log(error)
         })
-
-
 
         /* 사진 업로드 시 미리보기 */
         var sel_file;
@@ -67,8 +55,6 @@ export default {
             var filesArr = Array.prototype.slice.call(files);
             vm.newImage = e.target.files[0]
             this.newImage = e.target.files[0]
-            console.log(this.newImage)
-            console.log(vm.newImage)
             filesArr.forEach(function(f) {
                 if(!f.type.match("image.*")) {
                     alert("확장자는 이미지 확장자만 가능합니다.");
@@ -94,12 +80,6 @@ export default {
     methods : {
         updateJapan(e){
             e.preventDefault();
-            console.log('submit updateJapan')
-            console.log(this.newImage)
-            console.log(this.info)
-            console.log(this.$route.params.id)
-            console.log(this.week)
-            console.log(this.title)
 
             let config = {
                 headers: {
@@ -113,21 +93,15 @@ export default {
             const info = this.info
             const image = this.newImage
             const title = this.title
-            console.log(image)
 
             form.append('_method', 'patch')
             form.append('week', week)
             form.append('info', info)
             form.append('image', image)
             form.append('title', title)
-//   title : this.title,
-//                 week : this.week,
-//                 info : this.info,
-//                 image : this.newImage
+
             Axios.post('/api/japan/'+ this.$route.params.id, form, config)
             .then(response=>{
-                console.log('업데이트 응답')
-                console.log(response.data.msg)
                 this.$router.go(-1)
             })
             .catch(error=>{
