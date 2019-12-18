@@ -2015,30 +2015,13 @@ __webpack_require__.r(__webpack_exports__);
     });
 
     function handleImgFileSelect(e) {
-      var files = e.target.files;
-      var filesArr = Array.prototype.slice.call(files);
       vm.newImage = e.target.files[0];
-      this.newImage = e.target.files[0];
-      filesArr.forEach(function (f) {
-        if (!f.type.match("image.*")) {
-          alert("확장자는 이미지 확장자만 가능합니다.");
-          return;
-        }
+      var reader = new FileReader();
+      reader.readAsDataURL(vm.newImage); //이미지 파일 읽어서 e.target.result에 넘겨줌
 
-        sel_file = f;
-        var reader = new FileReader();
-
-        reader.onload = function (e) {
-          $("#img").attr("src", e.target.result);
-        };
-
-        reader.readAsDataURL(f);
-
-        function attachements_path() {
-          var $path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-          return public_path('images' + ($path ? DIRECTORY_SEPARATOR.$path : $path)); //public_pth : 우리 프로젝트의 웹 서버 루트 디렉터리의 절대 경로를 반환하는 함수
-        }
-      });
+      reader.onload = function (e) {
+        $("#img").attr("src", e.target.result);
+      };
     }
   },
   methods: {
@@ -2222,37 +2205,19 @@ __webpack_require__.r(__webpack_exports__);
     this.week = this.$route.params.week;
     /* 사진 업로드 시 미리보기 */
 
-    var sel_file;
     var vm = this;
     $(document).ready(function () {
       $("#input_img").on("change", handleImgFileSelect);
     });
 
     function handleImgFileSelect(e) {
-      var files = e.target.files;
-      var filesArr = Array.prototype.slice.call(files);
       vm.image = e.target.files[0];
-      this.image = e.target.files[0];
-      filesArr.forEach(function (f) {
-        if (!f.type.match("image.*")) {
-          alert("확장자는 이미지 확장자만 가능합니다.");
-          return;
-        }
+      var reader = new FileReader();
+      reader.readAsDataURL(vm.image); //이미지 파일 읽어서 e.target.result에 넘겨줌
 
-        sel_file = f;
-        var reader = new FileReader();
-
-        reader.onload = function (e) {
-          $("#img").attr("src", e.target.result);
-        };
-
-        reader.readAsDataURL(f);
-
-        function attachements_path() {
-          var $path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-          return public_path('images' + ($path ? DIRECTORY_SEPARATOR.$path : $path)); //public_pth : 우리 프로젝트의 웹 서버 루트 디렉터리의 절대 경로를 반환하는 함수
-        }
-      });
+      reader.onload = function (e) {
+        $("#img").attr("src", e.target.result);
+      };
     }
   },
   methods: {
@@ -2264,7 +2229,8 @@ __webpack_require__.r(__webpack_exports__);
       var config = {
         headers: {
           processData: true,
-          contentType: "multipart/form-data"
+          contentType: "multipart/form-data" // image 전송할 때는 타입을 지정해줘야함
+
         }
       };
       var form = new FormData();
@@ -2272,7 +2238,6 @@ __webpack_require__.r(__webpack_exports__);
       var info = this.info;
       var image = this.image;
       var title = this.title;
-      form.append('_method', 'post');
       form.append('week', week);
       form.append('info', info);
       form.append('image', image);

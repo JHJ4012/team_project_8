@@ -42,7 +42,7 @@ export default {
             this.$router.push('/member')
         },
         onImageChange(e){ // 이미지 파일 찾아내기
-            this.image = e.target.files[0]
+            this.image = e.target.files[0];
             var input = e.target.files[0];
             if(!input.type.match("image.*")) {
                 alert("확장자는 이미지 확장자만 가능합니다.");

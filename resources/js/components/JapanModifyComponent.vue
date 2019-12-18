@@ -51,28 +51,13 @@ export default {
         });
 
         function handleImgFileSelect(e) {
-            var files = e.target.files;
-            var filesArr = Array.prototype.slice.call(files);
-            vm.newImage = e.target.files[0]
-            this.newImage = e.target.files[0]
-            filesArr.forEach(function(f) {
-                if(!f.type.match("image.*")) {
-                    alert("확장자는 이미지 확장자만 가능합니다.");
-                    return;
-                }
+            vm.newImage = e.target.files[0];
 
-                sel_file = f;
-
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    $("#img").attr("src", e.target.result);
-                }
-                reader.readAsDataURL(f);
-                function attachements_path($path=''){
-                    return public_path('images'+($path ? DIRECTORY_SEPARATOR.$path : $path));
-                    //public_pth : 우리 프로젝트의 웹 서버 루트 디렉터리의 절대 경로를 반환하는 함수
-                }
-            });
+            var reader = new FileReader();
+            reader.readAsDataURL(vm.newImage); //이미지 파일 읽어서 e.target.result에 넘겨줌
+            reader.onload = function(e) {
+                $("#img").attr("src", e.target.result);
+            }
         }
     },
 
