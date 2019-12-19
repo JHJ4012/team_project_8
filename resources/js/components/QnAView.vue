@@ -21,8 +21,8 @@
             </form>
         </div>
         <button v-on:click="goBackList" style="margin-right: 3%">목록</button>
-        <button v-on:click = "updateQnA" style="margin-right: 3%" v-if="button_control == 1">수정</button><!-- 자신의 글에 대해 수정 권한 가짐 -->
-        <button v-on:click ="deleteQnA" v-if="button_control == 1 | user.admin == 'admin'">삭제</button> <!-- 자신의 글이거나, 관리자일 떄 삭제 권한 가짐-->
+        <button v-on:click = "updateQnA" style="margin-right: 3%" v-if="button_control == 'mine'">수정</button><!-- 자신의 글에 대해 수정 권한 가짐 -->
+        <button v-on:click ="deleteQnA" v-if="button_control == 'mine' | user.admin == 'admin'">삭제</button> <!-- 자신의 글이거나, 관리자일 떄 삭제 권한 가짐-->
     </div>
 </template>
 
@@ -49,7 +49,7 @@ export default {
             }
             if(this.qna.user_id == response.data.user)  //자신의 글인지 아닌지 확인하기 위해
             {
-                this.button_control = 1
+                this.button_control = 'mine'
             }
         })
         .catch(error => {
@@ -81,16 +81,13 @@ export default {
                 reply : this.view_reply
             })
             .then(response => {
-                this.filter(response.data.reply)    //댓글을 생성했을 때 화면 이동없이 바로 값을 바꿔주기 위해 filter라는 메서드를 연결한다
+                this.answers = response.data.reply
+                this.view_reply = ''
             })
             .catch(error=>{
                 console.log(error)
             })
         },
-        filter(new_answers){    //answers의 정보를 바꿔주고 view_reply 칸을 비워준다.
-            this.answers = new_answers
-            this.view_reply = ''
-        }
     }
 }
 </script>

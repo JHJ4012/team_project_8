@@ -32,9 +32,6 @@
 </template>
 <script>
 export default {
-    mounted() {
-            console.log('Component mounted.')
-        },
     data() {
         return{
             user_id : '',
@@ -46,20 +43,15 @@ export default {
         postLogin(e) {
             e.preventDefault();
             let currentObj = this;
-            console.log(this.user_id)
-            console.log(this.password)
             Axios.post('/api/login',{
                 user_id : this.user_id,
                 password : this.password,
             })
             .then(response => {
-                console.log($cookies.isKey('_token'))
-                // console.log(response)
                 window.location.href = '/';
             })
             .catch(error => {
                 this.message = '아이디와 비밀번호를 확인해 주세요'
-                console.log(error)
             });
         },
         back(){

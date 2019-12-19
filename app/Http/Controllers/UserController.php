@@ -59,7 +59,6 @@ class UserController extends Controller
             $cookie = $this->getCookieDetails($token);
             $session = new Session();           //여기서 세션 저장
             $session->set('user',$user->user_id);
-            debug($cookie);
             return response()->json([
                 'logged_in_user' =>$user,
                 'token' => $token,

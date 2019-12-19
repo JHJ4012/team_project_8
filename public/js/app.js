@@ -2295,9 +2295,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 /* harmony default export */ __webpack_exports__["default"] = ({
-  mounted: function mounted() {
-    console.log('Component mounted.');
-  },
   data: function data() {
     return {
       user_id: '',
@@ -2311,18 +2308,13 @@ __webpack_require__.r(__webpack_exports__);
 
       e.preventDefault();
       var currentObj = this;
-      console.log(this.user_id);
-      console.log(this.password);
       Axios.post('/api/login', {
         user_id: this.user_id,
         password: this.password
       }).then(function (response) {
-        console.log($cookies.isKey('_token')); // console.log(response)
-
         window.location.href = '/';
       })["catch"](function (error) {
         _this.message = '아이디와 비밀번호를 확인해 주세요';
-        console.log(error);
       });
     },
     back: function back() {
@@ -2800,8 +2792,6 @@ __webpack_require__.r(__webpack_exports__);
           title: this.title,
           question: this.question
         }).then(function (response) {
-          console.log(response.data.msg);
-
           _this.$router.push('/qna');
         })["catch"](function (error) {
           console.log(error);
@@ -2971,7 +2961,7 @@ __webpack_require__.r(__webpack_exports__);
 
       if (_this.qna.user_id == response.data.user) //자신의 글인지 아닌지 확인하기 위해
         {
-          _this.button_control = 1;
+          _this.button_control = 'mine';
         }
     })["catch"](function (error) {
       console.log(error);
@@ -3013,16 +3003,11 @@ __webpack_require__.r(__webpack_exports__);
         qna_id: this.$route.params.id,
         reply: this.view_reply
       }).then(function (response) {
-        _this3.filter(response.data.reply); //댓글을 생성했을 때 화면 이동없이 바로 값을 바꿔주기 위해 filter라는 메서드를 연결한다
-
+        _this3.answers = response.data.reply;
+        _this3.view_reply = '';
       })["catch"](function (error) {
         console.log(error);
       });
-    },
-    filter: function filter(new_answers) {
-      //answers의 정보를 바꿔주고 view_reply 칸을 비워준다.
-      this.answers = new_answers;
-      this.view_reply = '';
     }
   }
 });
@@ -41929,7 +41914,7 @@ var render = function() {
       [_vm._v("목록")]
     ),
     _vm._v(" "),
-    _vm.button_control == 1
+    _vm.button_control == "mine"
       ? _c(
           "button",
           {
@@ -41940,7 +41925,7 @@ var render = function() {
         )
       : _vm._e(),
     _vm._v(" "),
-    (_vm.button_control == 1) | (_vm.user.admin == "admin")
+    (_vm.button_control == "mine") | (_vm.user.admin == "admin")
       ? _c("button", { on: { click: _vm.deleteQnA } }, [_vm._v("삭제")])
       : _vm._e()
   ])

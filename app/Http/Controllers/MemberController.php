@@ -120,6 +120,8 @@ class MemberController extends Controller
             }
             $imagename = time().'.'.$request->image->getClientOriginalExtension();
             $request->image->move(public_path('images'), $imagename);
+            //move 하는 이유 : 파일을 불러오면 그것이 메인메모리에 save 되는데 이것은 temp 임시 파일이여서
+            //휘발성이다. 그래서 메인메모리에서 public 폴더로 옮겨줄 필요 있음
 
             Member::with('user')->where('user_id',$user_id[0]->id)->update([
                 'imagename'=>$imagename,
